@@ -40,9 +40,11 @@ FranceTerme official terminology database - French government open data for tech
 ## 📊 Statistiques
 
 - **8,309** termes au total dans la base FranceTerme
-- **194** nouveaux termes en 2025 (focus de cette application)
+- **1,283** termes récents (2020-2025) disponibles dans l'application
+- **194** nouveaux termes en 2025
 - **198** termes publiés en 2024
 - Couvre de multiples domaines: Sports, Environnement, Spatiologie, Nucléaire, Informatique, etc.
+- **Note:** L'application est prête à inclure automatiquement les termes 2026 dès leur publication officielle
 
 ## 🚀 Lancement
 
