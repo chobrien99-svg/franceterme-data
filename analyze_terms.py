@@ -88,15 +88,28 @@ def main():
     for domain, count in sorted(domains.items(), key=lambda x: x[1], reverse=True)[:10]:
         print(f"  {domain}: {count} terms")
 
-    # Get newest terms (2025)
-    newest_terms = [t for t in terms if t['year'] == 2025]
-    newest_terms.sort(key=lambda x: x['date'], reverse=True)
+    # Get recent terms (2020-2026)
+    recent_terms = [t for t in terms if t['year'] >= 2020 and t['year'] <= 2026]
+    recent_terms.sort(key=lambda x: x['date'], reverse=True)
 
-    print(f"\n✨ Newest terms from 2025 ({len(newest_terms)} terms):")
+    print(f"\n✨ Recent terms from 2020-2026 ({len(recent_terms)} terms):")
     print("=" * 60)
 
-    for i, term in enumerate(newest_terms[:20], 1):
-        print(f"\n{i}. 🆕 {term['term']}")
+    # Show count by year
+    year_counts = defaultdict(int)
+    for t in recent_terms:
+        year_counts[t['year']] += 1
+
+    print("\n📊 Terms by year (2020-2026):")
+    for year in sorted(year_counts.keys(), reverse=True):
+        print(f"  {year}: {year_counts[year]} terms")
+
+    # Show latest 20 terms
+    print(f"\n🆕 Latest 20 terms:")
+    print("=" * 60)
+
+    for i, term in enumerate(recent_terms[:20], 1):
+        print(f"\n{i}. {term['term']} ({term['year']})")
         print(f"   📅 {term['date_str']}")
         print(f"   🎨 Domain: {term['domain']}", end='')
         if term['subdomain']:
@@ -112,11 +125,17 @@ def main():
                 definition += "..."
             print(f"   📖 {definition}")
 
-    # Save all 2025 terms to JSON for web display
-    with open('terms_2025.json', 'w', encoding='utf-8') as f:
-        json.dump(newest_terms, f, ensure_ascii=False, indent=2, default=str)
+    # Save recent years (2020-2026) to JSON for web display
+    with open('terms_recent.json', 'w', encoding='utf-8') as f:
+        json.dump(recent_terms, f, ensure_ascii=False, indent=2, default=str)
 
-    print(f"\n\n💾 Saved {len(newest_terms)} terms from 2025 to terms_2025.json")
+    print(f"\n\n💾 Saved {len(recent_terms)} terms from 2020-2026 to terms_recent.json")
+
+    # Also keep 2025 only file for compatibility
+    terms_2025 = [t for t in terms if t['year'] == 2025]
+    with open('terms_2025.json', 'w', encoding='utf-8') as f:
+        json.dump(terms_2025, f, ensure_ascii=False, indent=2, default=str)
+    print(f"💾 Saved {len(terms_2025)} terms from 2025 to terms_2025.json (for compatibility)")
 
 if __name__ == '__main__':
     main()

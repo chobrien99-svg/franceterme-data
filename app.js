@@ -4,29 +4,33 @@ let termsData = [];
 let allTerms = []; // Store all terms for filtering
 let currentIndex = 0;
 let currentMode = 'card';
-let currentFilter = 'all';
-let currentSort = 'date';
+let currentDomainFilter = 'all';
+let currentYearFilter = 'all';
+let currentSort = 'date-newest';
 
 // Initialize the app
 async function init() {
     try {
-        const response = await fetch('terms_2025.json');
+        const response = await fetch('terms_recent.json');
         allTerms = await response.json();
         termsData = [...allTerms];
 
         // Update stats
         document.getElementById('stat-total').textContent = '8,309';
-        document.getElementById('stat-2025').textContent = termsData.length;
+        document.getElementById('stat-recent').textContent = termsData.length.toLocaleString();
 
         // Count unique domains
         const uniqueDomains = new Set(termsData.map(t => t.domain));
         document.getElementById('stat-domains').textContent = uniqueDomains.size;
 
-        // Setup filter dropdown
+        // Setup filter dropdowns
         setupFilters();
 
-        // Shuffle terms for variety
-        shuffleArray(termsData);
+        // Populate latest words widget
+        populateLatestWords();
+
+        // Apply initial sort
+        applyFiltersAndSort();
 
         // Setup mode buttons
         document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -48,8 +52,21 @@ async function init() {
 }
 
 function setupFilters() {
-    // Get all unique domains
+    // Get all unique years and domains
+    const years = [...new Set(allTerms.map(t => t.year))].sort((a, b) => b - a);
     const domains = [...new Set(allTerms.map(t => t.domain))].sort();
+
+    // Populate year filter
+    const yearFilter = document.getElementById('year-filter');
+    if (yearFilter) {
+        yearFilter.innerHTML = '<option value="all">Toutes les années</option>' +
+            years.map(y => `<option value="${y}">${y}</option>`).join('');
+
+        yearFilter.addEventListener('change', (e) => {
+            currentYearFilter = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
 
     // Populate domain filter
     const domainFilter = document.getElementById('domain-filter');
@@ -58,7 +75,7 @@ function setupFilters() {
             domains.map(d => `<option value="${d}">${getEmoji(d)} ${d}</option>`).join('');
 
         domainFilter.addEventListener('change', (e) => {
-            currentFilter = e.target.value;
+            currentDomainFilter = e.target.value;
             applyFiltersAndSort();
         });
     }
@@ -73,12 +90,51 @@ function setupFilters() {
     }
 }
 
+function populateLatestWords() {
+    // Get the 5 most recent terms
+    const latestTerms = [...allTerms]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+
+    const latestWordsGrid = document.getElementById('latest-words-grid');
+    if (latestWordsGrid) {
+        latestWordsGrid.innerHTML = latestTerms.map(term => `
+            <div class="latest-word-card" onclick="showTermDetails('${term.term.replace(/'/g, "\\'")}')">
+                <div class="latest-word-term">${term.term}</div>
+                <div class="latest-word-english">${term.english || 'N/A'}</div>
+                <div class="latest-word-domain">${getEmoji(term.domain)} ${term.domain}</div>
+                <div class="latest-word-date">📅 ${term.date_str}</div>
+            </div>
+        `).join('');
+    }
+}
+
+function showTermDetails(termName) {
+    // Find the term and show it in card mode
+    const index = termsData.findIndex(t => t.term === termName);
+    if (index !== -1) {
+        currentIndex = index;
+        currentMode = 'card';
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-mode="card"]').classList.add('active');
+        renderMode('card');
+        // Scroll to display area
+        document.getElementById('display-area').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
 function applyFiltersAndSort() {
+    // Start with all terms
+    termsData = [...allTerms];
+
+    // Filter by year
+    if (currentYearFilter !== 'all') {
+        termsData = termsData.filter(t => t.year === parseInt(currentYearFilter));
+    }
+
     // Filter by domain
-    if (currentFilter === 'all') {
-        termsData = [...allTerms];
-    } else {
-        termsData = allTerms.filter(t => t.domain === currentFilter);
+    if (currentDomainFilter !== 'all') {
+        termsData = termsData.filter(t => t.domain === currentDomainFilter);
     }
 
     // Apply sorting
@@ -91,6 +147,12 @@ function applyFiltersAndSort() {
             break;
         case 'date-oldest':
             termsData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            break;
+        case 'year-newest':
+            termsData.sort((a, b) => b.year - a.year || new Date(b.date) - new Date(a.date));
+            break;
+        case 'year-oldest':
+            termsData.sort((a, b) => a.year - b.year || new Date(a.date) - new Date(b.date));
             break;
         case 'domain':
             termsData.sort((a, b) => a.domain.localeCompare(b.domain, 'fr'));
@@ -107,7 +169,7 @@ function applyFiltersAndSort() {
     // Update result count
     const resultCount = document.getElementById('result-count');
     if (resultCount) {
-        resultCount.textContent = `${termsData.length} terme${termsData.length > 1 ? 's' : ''}`;
+        resultCount.textContent = `${termsData.length.toLocaleString()} terme${termsData.length > 1 ? 's' : ''}`;
     }
 }
 
