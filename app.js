@@ -1,22 +1,29 @@
 // FranceTerme Interactive Display App
 
 let termsData = [];
+let allTerms = []; // Store all terms for filtering
 let currentIndex = 0;
 let currentMode = 'card';
+let currentFilter = 'all';
+let currentSort = 'date';
 
 // Initialize the app
 async function init() {
     try {
-        const response = await fetch('terms_2024.json');
-        termsData = await response.json();
+        const response = await fetch('terms_2025.json');
+        allTerms = await response.json();
+        termsData = [...allTerms];
 
         // Update stats
         document.getElementById('stat-total').textContent = '8,309';
-        document.getElementById('stat-2024').textContent = termsData.length;
+        document.getElementById('stat-2025').textContent = termsData.length;
 
         // Count unique domains
         const uniqueDomains = new Set(termsData.map(t => t.domain));
         document.getElementById('stat-domains').textContent = uniqueDomains.size;
+
+        // Setup filter dropdown
+        setupFilters();
 
         // Shuffle terms for variety
         shuffleArray(termsData);
@@ -37,6 +44,70 @@ async function init() {
         console.error('Error loading terms:', error);
         document.getElementById('display-area').innerHTML =
             '<p style="color: white; text-align: center; font-size: 1.5em;">Chargement des termes...</p>';
+    }
+}
+
+function setupFilters() {
+    // Get all unique domains
+    const domains = [...new Set(allTerms.map(t => t.domain))].sort();
+
+    // Populate domain filter
+    const domainFilter = document.getElementById('domain-filter');
+    if (domainFilter) {
+        domainFilter.innerHTML = '<option value="all">Tous les domaines</option>' +
+            domains.map(d => `<option value="${d}">${getEmoji(d)} ${d}</option>`).join('');
+
+        domainFilter.addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
+
+    // Setup sort dropdown
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
+}
+
+function applyFiltersAndSort() {
+    // Filter by domain
+    if (currentFilter === 'all') {
+        termsData = [...allTerms];
+    } else {
+        termsData = allTerms.filter(t => t.domain === currentFilter);
+    }
+
+    // Apply sorting
+    switch(currentSort) {
+        case 'alpha':
+            termsData.sort((a, b) => a.term.localeCompare(b.term, 'fr'));
+            break;
+        case 'date-newest':
+            termsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            break;
+        case 'date-oldest':
+            termsData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            break;
+        case 'domain':
+            termsData.sort((a, b) => a.domain.localeCompare(b.domain, 'fr'));
+            break;
+        case 'random':
+            shuffleArray(termsData);
+            break;
+    }
+
+    // Reset index and re-render
+    currentIndex = 0;
+    renderMode(currentMode);
+
+    // Update result count
+    const resultCount = document.getElementById('result-count');
+    if (resultCount) {
+        resultCount.textContent = `${termsData.length} terme${termsData.length > 1 ? 's' : ''}`;
     }
 }
 
