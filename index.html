@@ -482,6 +482,45 @@
             font-size: 1.1em;
         }
 
+        footer {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            color: #666;
+        }
+
+        footer h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        footer p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        footer a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .attribution {
+            font-size: 0.95em;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2em;
@@ -566,6 +605,37 @@
         <div class="display-area" id="display-area">
             <!-- Content will be dynamically inserted here -->
         </div>
+
+        <footer>
+            <h3>📚 À propos des données</h3>
+            <p>
+                Les termes présentés sont issus de la base <strong>FranceTerme</strong>,
+                publiés au Journal officiel de la République française par la
+                <strong>Délégation générale à la langue française et aux langues de France (DGLFLF)</strong>.
+            </p>
+            <div class="attribution">
+                <p>
+                    <strong>Source:</strong>
+                    <a href="https://www.culture.fr/franceterme" target="_blank">FranceTerme - Ministère de la Culture</a>
+                </p>
+                <p>
+                    <strong>Licence:</strong>
+                    <a href="https://www.etalab.gouv.fr/wp-content/uploads/2014/05/Licence_Ouverte.pdf" target="_blank">
+                        Licence Ouverte / Open License
+                    </a>
+                </p>
+                <p style="font-size: 0.85em; margin-top: 10px;">
+                    Information publique administrative au sens de l'article 10 de la loi n° 78-753 du 17 juillet 1978.
+                    Vous pouvez réutiliser ces données sous les termes de la licence ouverte data.gouv.fr.
+                </p>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                API et documentation disponibles sur
+                <a href="https://data.culture.gouv.fr/explore/dataset/base-franceterme-termes-scientifiques-et-techniques/" target="_blank">
+                    data.culture.gouv.fr
+                </a>
+            </p>
+        </footer>
     </div>
 
     <script src="app.js"></script>

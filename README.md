@@ -6,6 +6,12 @@ FranceTerme official terminology database - French government open data for tech
 
 ## ✨ Fonctionnalités
 
+### 🎯 Filtrage et Tri
+- **Filtrer par domaine** - Sélectionnez un domaine spécifique (Sports, Informatique, Environnement, etc.)
+- **Tri multiple** - Par date (récents/anciens), alphabétique, par domaine, ou aléatoire
+- **Compteur de résultats** - Affiche le nombre de termes correspondant aux filtres
+- **Mise à jour dynamique** - Tous les modes de visualisation sont actualisés en temps réel
+
 ### 🎴 Carte Magique
 - Cartes à retourner (flip cards) montrant les termes français
 - Cliquez pour voir la définition complète
@@ -33,10 +39,10 @@ FranceTerme official terminology database - French government open data for tech
 
 ## 📊 Statistiques
 
-- **8,309** termes au total
-- **198** nouveaux termes en 2024
-- **194** termes en 2025
-- Couvre de multiples domaines: Biologie, Chimie, Sports, Informatique, etc.
+- **8,309** termes au total dans la base FranceTerme
+- **194** nouveaux termes en 2025 (focus de cette application)
+- **198** termes publiés en 2024
+- Couvre de multiples domaines: Sports, Environnement, Spatiologie, Nucléaire, Informatique, etc.
 
 ## 🚀 Lancement
 
@@ -90,11 +96,13 @@ Connectez votre repo GitHub sur https://pages.cloudflare.com
 
 ## 📁 Fichiers
 
-- `index.html` - Interface principale
-- `app.js` - Logique JavaScript pour les interactions
-- `terms_2024.json` - Données des termes 2024
-- `FranceTerme.xml` - Fichier source complet
-- `analyze_terms.py` - Script d'analyse Python
+- `index.html` - Interface principale avec filtres et tri
+- `app.js` - Logique JavaScript pour les interactions et le filtrage
+- `terms_2025.json` - Données des termes 2025 (194 termes)
+- `terms_2024.json` - Données des termes 2024 (198 termes)
+- `FranceTerme.xml` - Fichier source complet (8,309 termes)
+- `analyze_terms.py` - Script d'analyse et d'extraction Python
+- `API_DOCUMENTATION.md` - Documentation complète de l'API FranceTerme
 
 ## 🎨 Caractéristiques de Design
 
@@ -104,12 +112,13 @@ Connectez votre repo GitHub sur https://pages.cloudflare.com
 - **Typographie claire** - Facile à lire
 - **Emojis contextuels** - Icônes pour chaque domaine
 
-## 💡 Exemples de Termes Récents (2024)
+## 💡 Exemples de Termes Récents (2025)
 
-- **batterie tout-solide** ⚡ (all solid-state battery)
-- **broyat noir** 🌍 (black mass) - pour le recyclage
-- **cellule lame** 🚗 (blade cell) - batteries automobiles
-- **à rejouer !** ⚽ (let) - terme de badminton
+- **barrière géologique** ⚛️ (geological barrier) - Nucléaire
+- **champ magnétique toroïdal** ⚛️ (toroidal field) - Fusion nucléaire
+- **confinement amélioré** ⚛️ (high confinement mode) - Fusion
+- **solénoïde central** ⚛️ (central solenoid) - Tokamak
+- **temps de confinement de l'énergie** ⚛️ (confinement time) - Physique
 
 ## 🔧 Personnalisation
 
@@ -118,6 +127,30 @@ Modifiez `app.js` pour:
 - Ajouter de nouveaux modes de visualisation
 - Filtrer par domaine spécifique
 - Ajuster le nombre de termes affichés
+
+## 🔌 API et Accès aux Données
+
+FranceTerme fournit une API REST complète pour accéder aux données :
+
+### Documentation Complète
+Consultez [`API_DOCUMENTATION.md`](./API_DOCUMENTATION.md) pour :
+- Endpoints API disponibles
+- Exemples de requêtes
+- Formats de données (JSON, CSV, XML)
+- Guide d'intégration
+- Informations de licence
+
+### Accès Rapide
+- **API Explorer**: https://data.culture.gouv.fr/api/explore/v2.0/catalog/datasets/base-franceterme-termes-scientifiques-et-techniques/
+- **Dataset Page**: https://data.culture.gouv.fr/explore/dataset/base-franceterme-termes-scientifiques-et-techniques/
+
+### Exemple d'utilisation
+```javascript
+// Récupérer les termes de 2025
+fetch('https://data.culture.gouv.fr/api/explore/v2.0/catalog/datasets/base-franceterme-termes-scientifiques-et-techniques/records?where=date_pub>="2025-01-01"')
+  .then(response => response.json())
+  .then(data => console.log(data.results));
+```
 
 ## 📚 Source
 
