@@ -88,11 +88,11 @@ def main():
     for domain, count in sorted(domains.items(), key=lambda x: x[1], reverse=True)[:10]:
         print(f"  {domain}: {count} terms")
 
-    # Get newest terms (2024)
-    newest_terms = [t for t in terms if t['year'] == 2024]
+    # Get newest terms (2025)
+    newest_terms = [t for t in terms if t['year'] == 2025]
     newest_terms.sort(key=lambda x: x['date'], reverse=True)
 
-    print(f"\n✨ Newest terms from 2024 ({len(newest_terms)} terms):")
+    print(f"\n✨ Newest terms from 2025 ({len(newest_terms)} terms):")
     print("=" * 60)
 
     for i, term in enumerate(newest_terms[:20], 1):
@@ -112,11 +112,11 @@ def main():
                 definition += "..."
             print(f"   📖 {definition}")
 
-    # Save all 2024 terms to JSON for web display
-    with open('terms_2024.json', 'w', encoding='utf-8') as f:
+    # Save all 2025 terms to JSON for web display
+    with open('terms_2025.json', 'w', encoding='utf-8') as f:
         json.dump(newest_terms, f, ensure_ascii=False, indent=2, default=str)
 
-    print(f"\n\n💾 Saved {len(newest_terms)} terms from 2024 to terms_2024.json")
+    print(f"\n\n💾 Saved {len(newest_terms)} terms from 2025 to terms_2025.json")
 
 if __name__ == '__main__':
     main()
