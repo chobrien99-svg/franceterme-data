@@ -55,6 +55,39 @@ Puis ouvrez: http://localhost:8000
 ### Option 3: Ouvrir directement
 Ouvrez `index.html` dans votre navigateur (certaines fonctionnalités peuvent ne pas fonctionner)
 
+## 🌐 Déploiement en Ligne
+
+### GitHub Pages (Recommandé)
+```bash
+# Exécuter le script de déploiement
+bash deploy-github-pages.sh
+
+# Puis activer dans les paramètres GitHub:
+# Settings > Pages > Source: main branch /docs folder
+```
+Votre site sera accessible à: `https://USERNAME.github.io/franceterme-data/`
+
+### Netlify
+```bash
+# Option 1: CLI
+npm install -g netlify-cli
+netlify deploy --prod
+
+# Option 2: Drag & Drop
+# Visitez https://app.netlify.com/drop et glissez le dossier
+```
+Configuration incluse dans `netlify.toml`
+
+### Vercel
+```bash
+npm install -g vercel
+vercel --prod
+```
+Configuration incluse dans `vercel.json`
+
+### Cloudflare Pages
+Connectez votre repo GitHub sur https://pages.cloudflare.com
+
 ## 📁 Fichiers
 
 - `index.html` - Interface principale
