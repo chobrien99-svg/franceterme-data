@@ -66,7 +66,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
 #fact i{display:block;margin-top:3px}
 #fact small{opacity:.7}
 
-#heard{position:absolute;right:12px;top:44px;max-width:60%;background:#000a;color:var(--paper);padding:5px 10px;border-radius:12px;font-size:14px;z-index:5;opacity:0;transition:opacity .3s}
+#heard{position:absolute;right:12px;top:12px;max-width:60%;background:#000a;color:var(--paper);padding:5px 10px;border-radius:12px;font-size:14px;z-index:5;opacity:0;transition:opacity .3s}
 #heard.show{opacity:1}
 
 /* Professor popup in the sky */
@@ -106,19 +106,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
 .toggle{background:#2a1d14;color:var(--brass-hi);border:2px solid var(--ink);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700}
 .toggle[aria-pressed="true"]{background:var(--verdigris);color:#08201c}
 .toggle[hidden]{display:none}
-/* Sits above the dialogue screens so players can enlarge the game during the intro */
-#fsBtn{position:absolute;right:8px;top:8px;z-index:11;opacity:.85}
-#fsBtn:hover,#fsBtn:focus-visible{opacity:1}
-@media (max-width:600px){ #fsTxt{display:none} #fsBtn{padding:3px 9px;font-size:15px} }
-/* Short screens and embeds: tighten the machine so the sky keeps its room */
-@media (max-height:640px){
-  #hud{padding:5px 12px}
-  #machine{padding:16px 12px 6px}
-  #prompt{margin:2px 0 5px;font-size:14px}
-  .opt{min-height:44px;padding:6px 6px 6px 24px;font-size:15px}
-  #controls{margin-top:6px}
-  .toggle{padding:3px 10px;font-size:12px}
-}
+/* Sits at the right end of the HUD, outside the playfield, and above the dialogue
+   screens so players can enlarge the game during the intro */
+#fsBtn{position:absolute;right:10px;top:9px;z-index:11}
+#hud{padding-right:138px}
+@media (max-width:600px){ #fsTxt{display:none} #fsBtn{padding:3px 9px;font-size:15px} #hud{padding-right:56px} }
 
 /* Dialogue with the professor */
 .screen{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:#0d1224e0;overflow:auto}
@@ -159,11 +151,22 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
   #dialog .speech{margin-bottom:0;border-radius:18px}
   #profPop .bub{font-size:14px;max-width:200px}
 }
+/* Short screens and embeds: tighten the machine so the sky keeps its room */
+@media (max-height:640px){
+  #hud{padding-top:5px;padding-bottom:5px}
+  #fsBtn{top:6px}
+  #machine{padding:16px 12px 6px}
+  #prompt{margin:2px 0 5px;font-size:14px}
+  .opt{min-height:44px;padding-top:6px;padding-bottom:6px}
+  #controls{margin-top:6px}
+  .toggle{padding:3px 10px;font-size:12px}
+}
 @media (prefers-reduced-motion: reduce){ #dialog .big-prof{animation:none} .talking .mouth{animation:none} }
 </style>
 </head>
 <body>
 <div id="game">
+  <button class="toggle" id="fsBtn" aria-pressed="false" aria-label="Plein écran" title="Plein écran"><span id="fsIco">⛶</span><span id="fsTxt"> Plein écran</span></button>
   <div id="hud">
     <div class="plate"><small>Score</small> <span id="score">0</span></div>
     <div id="gaugeWrap"><span>Pureté linguistique</span><div id="gauge"><div id="gaugeFill"></div></div></div>
@@ -174,7 +177,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
     <svg id="skyline" viewBox="0 0 900 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path fill="#0b1020" d="M0 300V230h40v-30h30v30h50v-50h20v50h60v-20h40v20h30v-60h25v60h45V200h35v100zM420 300l40-140 8-80 6-70 6 70 8 80 40 140h-30l-24-60-24 60zM560 300v-80h40v-25h30v25h50v-40h20v40h60v-30h40v30h40v-60h25v60h35v80z"/></svg>
     <div id="banner"><div id="bannerText"></div></div>
     <div id="heard"></div>
-    <button class="toggle" id="fsBtn" aria-pressed="false" aria-label="Plein écran" title="Plein écran"><span id="fsIco">⛶</span><span id="fsTxt"> Plein écran</span></button>
     <div id="profPop" aria-live="polite"><div class="mini"></div><div class="bub"></div></div>
     <div id="fact"></div>
   </div>
@@ -670,7 +672,7 @@ fsBtn.onclick = () => {
   else { const r = (d.requestFullscreen || d.webkitRequestFullscreen).call(d); if(r && r.catch) r.catch(() => { if(framed) window.open(location.href, "_blank", "noopener"); }); }
 };
 const fsSync = () => { const on = !!fsEl(); fsBtn.setAttribute("aria-pressed", on); const t = on ? "Quitter le plein écran" : "Plein écran";
-  $("fsIco").textContent = on ? "✕" : "⛶"; $("fsTxt").textContent = " " + t; fsBtn.setAttribute("aria-label", t); fsBtn.title = t; };
+  $("fsIco").textContent = on ? "✕" : "⛶"; fsBtn.setAttribute("aria-label", t); fsBtn.title = t; };
 document.addEventListener("fullscreenchange", fsSync); document.addEventListener("webkitfullscreenchange", fsSync);
 
 document.addEventListener("keydown", e => {
