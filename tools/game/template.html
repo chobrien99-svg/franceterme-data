@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Opération La Défense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Alegreya+Sans:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#2c3d63; --sky-bot:#5b5f86; --brass:#c9a34a; --brass-hi:#f0d58a; --brass-lo:#7a5a1e;
+  --copper:#b0643a; --verdigris:#4f9a8a; --paper:#efe3c4; --ink:#2a1d14; --habit:#2f5d3a;
+  --bleu:#2b4ea2; --rouge:#c8323b; --text:#f6ecd2;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --sky-top:#141c33; --sky-bot:#34385a; } }
+:root[data-theme="dark"]{ --sky-top:#141c33; --sky-bot:#34385a; }
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--sky-top);color:var(--text);font-family:"Alegreya Sans",system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outline-offset:2px}
+#game{position:relative;height:100%;display:flex;flex-direction:column;max-width:900px;margin:0 auto}
+
+/* HUD */
+#hud{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;background:linear-gradient(#3a2a1a,#24180e);border-bottom:3px solid var(--brass-lo);z-index:5}
+.plate{background:linear-gradient(var(--brass-hi),var(--brass) 45%,var(--brass-lo));color:var(--ink);border-radius:6px;padding:4px 10px;font-weight:800;box-shadow:inset 0 0 0 1px #00000040;font-size:15px;white-space:nowrap}
+.plate small{font-weight:700;opacity:.75}
+#gaugeWrap{display:flex;align-items:center;gap:8px;flex:1;max-width:320px}
+#gaugeWrap span{font-size:13px;color:var(--brass-hi);white-space:nowrap}
+#gauge{flex:1;height:16px;border-radius:9px;background:#120c06;border:2px solid var(--brass);overflow:hidden}
+#gaugeFill{height:100%;width:100%;background:linear-gradient(90deg,var(--bleu) 0 33%,#f4f1ea 33% 66%,var(--rouge) 66%);transition:width .3s}
+
+/* Sky */
+#sky{position:relative;flex:1;overflow:hidden;background:linear-gradient(var(--sky-top),var(--sky-bot))}
+#skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:46%;opacity:.35;pointer-events:none}
+.word{position:absolute;left:0;top:0;padding:6px 12px 7px;background:var(--paper);color:var(--ink);border-radius:4px 14px 4px 14px;font-weight:800;font-size:18px;white-space:nowrap;box-shadow:0 3px 0 #00000055;border:2px solid var(--ink);will-change:transform;cursor:crosshair}
+.word::before{content:"";position:absolute;left:50%;top:-34px;width:2px;height:30px;background:#ffffff70}
+.word::after{content:"";position:absolute;left:calc(50% - 13px);top:-58px;width:26px;height:28px;border-radius:50% 50% 45% 45%;background:var(--copper);box-shadow:inset -4px -4px 0 #0003}
+.word .eyes{display:inline-block;margin-right:6px;font-size:13px;letter-spacing:-1px}
+.word.target{outline:3px dashed var(--brass-hi);outline-offset:4px}
+.word.boss{font-size:24px;padding:10px 18px;background:#f3d9c9;border-width:3px}
+.word.boss::after{width:44px;left:calc(50% - 22px);top:-70px;height:40px;background:var(--rouge)}
+.word .hp{display:inline-block;margin-left:8px;color:var(--rouge);font-size:16px}
+.word.converted{background:#fff;border-color:var(--bleu);color:var(--bleu);transition:opacity .9s .5s, transform .9s ease-out}
+.word.converted::after{background:var(--bleu)}
+.franglais{position:absolute;left:0;top:0;padding:5px 11px;border-radius:16px;background:#ffe6ee;color:#7a1430;border:2px dashed #7a1430;font-weight:700;font-style:italic;font-size:15px;white-space:nowrap;cursor:pointer;z-index:2}
+.franglais::before{content:"🗯 ";font-style:normal}
+.beret{position:absolute;left:50%;top:-16px;transform:translateX(-50%) rotate(-12deg);width:34px;height:14px;background:#1b1b2e;border-radius:50% 50% 30% 30%}
+.beret::after{content:"";position:absolute;left:50%;top:-5px;width:3px;height:6px;background:#1b1b2e}
+.ball{position:absolute;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--brass) 45%,var(--brass-lo));z-index:4;pointer-events:none}
+.puff{position:absolute;width:14px;height:14px;border-radius:50%;background:#ffffffcc;pointer-events:none;z-index:4}
+.splat{position:absolute;font-family:Limelight,serif;color:var(--rouge);font-size:22px;pointer-events:none;z-index:4;text-shadow:0 2px 0 #0008}
+.pts{position:absolute;font-weight:800;color:var(--brass-hi);font-size:18px;pointer-events:none;z-index:4;text-shadow:0 2px 0 #0008}
+
+#banner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:6;text-align:center}
+#banner div{font-family:Limelight,serif;font-size:clamp(30px,7vw,58px);color:var(--brass-hi);text-shadow:0 4px 0 var(--ink);opacity:0;padding:0 12px}
+#banner div.show{animation:bannerIn 1.8s ease-out}
+@keyframes bannerIn{0%{opacity:0;transform:scale(.6)}20%{opacity:1;transform:scale(1.05)}80%{opacity:1}100%{opacity:0;transform:scale(1)}}
+
+#fact{position:absolute;left:12px;right:12px;bottom:12px;max-width:460px;margin:0 auto;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:8px;padding:8px 12px;font-size:14px;line-height:1.35;z-index:5;transform:translateY(160%);transition:transform .35s}
+#fact.show{transform:translateY(0)}
+#fact b{color:var(--bleu);font-size:16px}
+#fact i{display:block;margin-top:3px}
+#fact small{opacity:.7}
+
+#heard{position:absolute;right:12px;top:12px;max-width:60%;background:#000a;color:var(--paper);padding:5px 10px;border-radius:12px;font-size:14px;z-index:5;opacity:0;transition:opacity .3s}
+#heard.show{opacity:1}
+
+/* Professor popup in the sky */
+#profPop{position:absolute;left:8px;top:8px;display:flex;align-items:flex-start;gap:6px;z-index:7;pointer-events:none;transform:translateX(-130%);transition:transform .25s ease-out}
+#profPop.show{transform:translateX(0)}
+#profPop .mini{width:78px;height:94px;flex:none}
+#profPop .bub{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:6px 10px;max-width:250px;font-weight:800;font-size:16px;line-height:1.2;margin-top:10px;position:relative}
+#profPop .bub small{display:block;font-weight:400;font-style:italic;font-size:12px;opacity:.7;margin-top:2px}
+
+/* Machine */
+#machine{position:relative;padding:22px 12px 10px;background:
+  repeating-linear-gradient(90deg,#00000018 0 2px,transparent 2px 46px),
+  linear-gradient(var(--brass-hi),var(--brass) 18%,var(--brass-lo));
+  border-top:4px solid var(--ink);z-index:3}
+#machine.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+#cannon{position:absolute;left:50%;top:-34px;width:30px;height:56px;margin-left:-15px;transform-origin:50% 90%;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi) 40%,var(--brass-lo));border:3px solid var(--ink);border-radius:10px 10px 6px 6px;transition:transform .12s}
+#cannon::after{content:"";position:absolute;left:-12px;right:-12px;bottom:-12px;height:20px;background:var(--copper);border:3px solid var(--ink);border-radius:12px 12px 4px 4px}
+.rivets{position:absolute;top:6px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.rivets i{width:7px;height:7px;border-radius:50%;background:var(--brass-lo);box-shadow:inset 1px 1px 0 var(--brass-hi)}
+#prompt{text-align:center;color:var(--ink);font-weight:800;font-size:15px;margin:4px 0 8px;min-height:1.2em}
+#prompt em{font-weight:700;font-style:normal;opacity:.75}
+#options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opt{position:relative;min-height:54px;padding:8px 8px 8px 26px;border:3px solid var(--ink);border-radius:10px;background:linear-gradient(#3b2a19,#23170c);color:var(--paper);font-size:16px;font-weight:700;line-height:1.15;box-shadow:0 4px 0 var(--ink)}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.opt kbd{position:absolute;left:7px;top:6px;font-family:inherit;font-size:12px;color:var(--brass-hi)}
+.opt.wrong{background:var(--rouge);animation:shake .3s}
+.opt.right{background:var(--bleu)}
+.opt:disabled{opacity:.5}
+#typeBox{display:none;gap:8px}
+#typeBox.on{display:flex}
+#typeBox input{flex:1;min-width:0;font:inherit;font-size:18px;font-weight:700;padding:10px 12px;border:3px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink)}
+#typeBox button{border:3px solid var(--ink);border-radius:10px;background:var(--rouge);color:#fff;font-weight:800;font-size:17px;padding:0 16px;box-shadow:0 4px 0 var(--ink)}
+#hint{text-align:center;color:var(--ink);font-weight:800;letter-spacing:2px;font-size:15px;margin-top:6px;min-height:1em;display:none}
+#hint.on{display:block}
+#controls{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.toggle{background:#2a1d14;color:var(--brass-hi);border:2px solid var(--ink);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700}
+.toggle[aria-pressed="true"]{background:var(--verdigris);color:#08201c}
+
+/* Dialogue with the professor */
+.screen{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:#0d1224e0;overflow:auto}
+.screen[hidden]{display:none}
+#dialog .scene{display:flex;align-items:flex-end;gap:10px;max-width:640px;width:100%}
+#dialog .big-prof{width:min(38vw,210px);flex:none;animation:profIn .5s ease-out}
+@keyframes profIn{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+#dialog .speech{flex:1;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:18px 18px 18px 4px;padding:18px 18px 14px;box-shadow:0 6px 0 var(--brass-lo);margin-bottom:40px}
+#dialog .fr{font-family:Limelight,serif;font-size:clamp(21px,4.4vw,30px);line-height:1.15;color:var(--bleu);margin:0 0 8px}
+#dialog .en{font-size:16px;line-height:1.45;margin:0 0 10px}
+#dialog .en b{color:var(--rouge)}
+#dialog .who{font-size:13px;font-style:italic;opacity:.7;margin:0 0 6px}
+#dialog .acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:8px}
+.big{background:linear-gradient(var(--brass-hi),var(--brass) 50%,var(--brass-lo));color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:10px 20px;font-size:18px;font-weight:800;box-shadow:0 5px 0 var(--ink)}
+.big.alt{background:#fff}
+.howto{margin:6px 0 4px;padding-left:20px;font-size:15px;line-height:1.45}
+.dots{display:flex;gap:6px;margin-right:auto;align-items:center}
+.dots i{width:9px;height:9px;border-radius:50%;background:#0003}
+.dots i.on{background:var(--bleu)}
+.talking .mouth{animation:talk .18s infinite alternate;transform-origin:100px 132px}
+@keyframes talk{from{transform:scaleY(1)}to{transform:scaleY(.35)}}
+
+/* Game over */
+#over .card{max-width:520px;width:100%;text-align:center;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:14px;padding:18px;box-shadow:0 8px 0 var(--brass-lo)}
+#over h2{font-family:Limelight,serif;font-weight:400;font-size:clamp(26px,6vw,36px);margin:0 0 10px;color:var(--rouge)}
+#shareImg{width:100%;max-width:340px;border:3px solid var(--ink);border-radius:8px;display:block;margin:0 auto 10px;background:#ddd;aspect-ratio:4/5;object-fit:cover}
+#over p{margin:6px 0;font-size:15px}
+#over .acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+#saveNote{font-size:13px;opacity:.75;min-height:1.2em}
+
+@media (max-width:560px){
+  .word{font-size:15px}.word.boss{font-size:19px}
+  .opt{font-size:14px;min-height:60px;padding-left:22px}
+  #hud{flex-wrap:wrap}
+  #gaugeWrap{order:3;max-width:none;flex-basis:100%}
+  #dialog .scene{flex-direction:column;align-items:center}
+  #dialog .big-prof{width:130px}
+  #dialog .speech{margin-bottom:0;border-radius:18px}
+  #profPop .bub{font-size:14px;max-width:200px}
+}
+@media (prefers-reduced-motion: reduce){ #dialog .big-prof{animation:none} .talking .mouth{animation:none} }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="hud">
+    <div class="plate"><small>Score</small> <span id="score">0</span></div>
+    <div id="gaugeWrap"><span>Pureté linguistique</span><div id="gauge"><div id="gaugeFill"></div></div></div>
+    <div class="plate"><small>Vague</small> <span id="wave">1</span></div>
+  </div>
+
+  <div id="sky">
+    <svg id="skyline" viewBox="0 0 900 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path fill="#0b1020" d="M0 300V230h40v-30h30v30h50v-50h20v50h60v-20h40v20h30v-60h25v60h45V200h35v100zM420 300l40-140 8-80 6-70 6 70 8 80 40 140h-30l-24-60-24 60zM560 300v-80h40v-25h30v25h50v-40h20v40h60v-30h40v30h40v-60h25v60h35v80z"/></svg>
+    <div id="banner"><div id="bannerText"></div></div>
+    <div id="heard"></div>
+    <div id="profPop" aria-live="polite"><div class="mini"></div><div class="bub"></div></div>
+    <div id="fact"></div>
+  </div>
+
+  <div id="machine">
+    <div id="cannon"></div>
+    <div class="rivets"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="prompt"></div>
+    <div id="options"></div>
+    <div id="typeBox"><input id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Tapez le terme français"><button id="typeFire">Feu !</button></div>
+    <div id="hint"></div>
+    <div id="controls">
+      <button class="toggle" id="voiceBtn" aria-pressed="false">🎙️ Mode Académicien (voix)</button>
+      <button class="toggle" id="soundBtn" aria-pressed="true">🔊 Son et voix</button>
+    </div>
+  </div>
+
+  <div class="screen" id="dialog" hidden>
+    <div class="scene">
+      <div class="big-prof"></div>
+      <div class="speech">
+        <p class="who">Hippolyte Dupont-Circonflexe, de l'Académie (presque) française</p>
+        <p class="fr" id="dFr"></p>
+        <div class="en" id="dEn"></div>
+        <div class="acts"><div class="dots" id="dDots"></div><span id="dActs"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="over" hidden>
+    <div class="card">
+      <h2 id="overTitle">La Machine a cédé !</h2>
+      <img id="shareImg" alt="Votre carte de score">
+      <p id="overStats"></p>
+      <div class="acts">
+        <button class="big" id="saveBtn">Enregistrer l'image</button>
+        <button class="big alt" id="copyBtn">Copier le texte</button>
+        <button class="big" id="againBtn">Rejouer</button>
+      </div>
+      <p id="saveNote">Sur mobile, vous pouvez aussi appuyer longuement sur l'image pour l'enregistrer.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================= DATA (from the FranceTerme open-data XML) ======================= */
+const DATA = /*DATA*/;
+const JOKES = {
+  "hashtag":"Le # se dit « dièse », comme en musique. Voilà.",
+  "start-up":"A young sprout. Water regularly with venture capital.",
+  "podcast":"Yes, really: officially it's just « audio ».",
+  "smartphone":"Mobile multifonction. Try saying that while doomscrolling.",
+  "open space":"Your open space is officially a « plateau ». Like a TV set, with fewer snacks.",
+  "deepfake":"An infox, but in video. Logique.",
+  "frisbee":"Disque-volant: a flying disc, which is exactly what it is.",
+  "post-it note":"A papillon: a butterfly stuck to your monitor.",
+  "joystick":"A manche à balai: a broomstick. Witches were early gamers.",
+  "smiley":"A frimousse: a cute little face. Adorable, officially.",
+  "cash cow":"Vache à lait. Some things translate perfectly.",
+  "dunk":"Panier smashé. The Commission has range.",
+  "pace maker":"Le lièvre: the hare who sets the pace.",
+  "chick lit":"Romance urbaine. Bridget Jones, en Vélib'.",
+  "marketing":"Mercatique. Nobody says it. Be the first.",
+  "not in my back yard":"« Non au projet ici. » Translation is concise, at least.",
+  "burnout":"Four words in French instead of one. Exhausting.",
+  "brainstorming":"Literally: stir the brain-membranes.",
+  "binge watching":"Visionnage boulimique: as greedy as it sounds."
+};
+
+/* ======================= Professor (SVG) ======================= */
+function profSVG(mood="happy"){
+  const face = mood==="angry" ? "#f2a08e" : "#f2c9a5";
+  const brows = mood==="angry"
+    ? '<path d="M72 86 L94 94 M128 86 L106 94" stroke="#eee" stroke-width="6" stroke-linecap="round"/>'
+    : mood==="shock" ? '<path d="M72 80 Q83 72 94 80 M106 80 Q117 72 128 80" stroke="#eee" stroke-width="6" fill="none" stroke-linecap="round"/>'
+    : '<path d="M72 86 Q83 78 94 86 M106 86 Q117 78 128 86" stroke="#eee" stroke-width="6" fill="none" stroke-linecap="round"/>';
+  const mouth = mood==="angry" ? '<ellipse class="mouth" cx="100" cy="134" rx="11" ry="8" fill="#5a1515"/>'
+    : mood==="shock" ? '<ellipse class="mouth" cx="100" cy="135" rx="7" ry="10" fill="#5a1515"/>'
+    : '<path class="mouth" d="M89 131 Q100 142 111 131 Z" fill="#5a1515"/>';
+  return `<svg viewBox="0 -6 200 246" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Le professeur Dupont-Circonflexe">
+  <path d="M28 240 Q34 168 100 156 Q166 168 172 240 Z" fill="#2f5d3a" stroke="#14261a" stroke-width="3"/>
+  <path d="M100 160 L80 240 M100 160 L120 240" stroke="#d9b44a" stroke-width="3" fill="none"/>
+  <g fill="#d9b44a"><ellipse cx="62" cy="196" rx="9" ry="4" transform="rotate(-35 62 196)"/><ellipse cx="54" cy="212" rx="9" ry="4" transform="rotate(-35 54 212)"/><ellipse cx="138" cy="196" rx="9" ry="4" transform="rotate(35 138 196)"/><ellipse cx="146" cy="212" rx="9" ry="4" transform="rotate(35 146 212)"/><ellipse cx="70" cy="226" rx="9" ry="4" transform="rotate(-35 70 226)"/><ellipse cx="130" cy="226" rx="9" ry="4" transform="rotate(35 130 226)"/></g>
+  <path d="M86 158 L100 186 L114 158 Z" fill="#fff" stroke="#14261a" stroke-width="2"/>
+  <path d="M93 162 L100 176 L107 162 Z" fill="#c8323b"/>
+  <rect x="156" y="170" width="8" height="40" rx="3" fill="#d9b44a" stroke="#6b4f12" stroke-width="2" transform="rotate(18 160 190)"/>
+  <circle cx="57" cy="110" r="8" fill="${face}" stroke="#7a4b2f" stroke-width="2"/><circle cx="143" cy="110" r="8" fill="${face}" stroke="#7a4b2f" stroke-width="2"/>
+  <circle cx="100" cy="108" r="44" fill="${face}" stroke="#7a4b2f" stroke-width="3"/>
+  <path d="M60 96 Q50 128 62 140 M140 96 Q150 128 138 140" stroke="#eee" stroke-width="8" fill="none" stroke-linecap="round"/>
+  ${brows}
+  <circle cx="84" cy="100" r="5" fill="#1b1b2e"/><circle cx="116" cy="100" r="5" fill="#1b1b2e"/>
+  <circle cx="116" cy="100" r="12" fill="#ffffff30" stroke="#d9b44a" stroke-width="3"/>
+  <path d="M128 102 Q140 130 132 160" stroke="#d9b44a" stroke-width="1.5" fill="none"/>
+  <ellipse cx="100" cy="114" rx="9" ry="7" fill="#e39a7f"/>
+  ${mouth}
+  <path d="M100 122 Q86 118 74 124 Q64 130 60 122 Q66 134 80 132 Q92 130 100 126 Q108 130 120 132 Q134 134 140 122 Q136 130 126 124 Q114 118 100 122 Z" fill="#f4f4f4" stroke="#bbb" stroke-width="1.5"/>
+  <path d="M8 70 Q32 64 46 38 Q70 4 100 6 Q130 4 154 38 Q168 64 192 70 Q152 70 130 78 Q100 90 70 78 Q48 70 8 70 Z" fill="#1b1b2e" stroke="#000" stroke-width="2"/><circle cx="30" cy="58" r="5" fill="#2a2a3a"/><circle cx="42" cy="44" r="5" fill="#2a2a3a"/><circle cx="56" cy="31" r="5" fill="#2a2a3a"/><circle cx="72" cy="20" r="5" fill="#2a2a3a"/><circle cx="88" cy="13" r="5" fill="#2a2a3a"/><circle cx="104" cy="11" r="5" fill="#2a2a3a"/><circle cx="120" cy="14" r="5" fill="#2a2a3a"/><circle cx="136" cy="21" r="5" fill="#2a2a3a"/><circle cx="150" cy="32" r="5" fill="#2a2a3a"/><circle cx="163" cy="45" r="5" fill="#2a2a3a"/><circle cx="173" cy="57" r="5" fill="#2a2a3a"/><path d="M24 66 Q48 58 62 40 Q80 18 100 18 Q120 18 138 40 Q152 58 176 66" stroke="#d9b44a" stroke-width="2.5" fill="none"/><path d="M118 30 L126 66" stroke="#d9b44a" stroke-width="3"/><circle cx="118" cy="32" r="10" fill="#2b4ea2"/><circle cx="118" cy="32" r="6.5" fill="#fff"/><circle cx="118" cy="32" r="3" fill="#c8323b"/>
+  </svg>`;
+}
+
+/* ======================= Lines ======================= */
+const WRONG = [["Quel maladroit !","What a clumsy oaf!"],["Traître à la patrie de Molière !","Traitor to the land of Molière!"],["Saccageur de dictionnaire !","Dictionary vandal!"],["Quelle infamie !","What an outrage!"],["Mes oreilles saignent !","My ears are bleeding!"],["Oh là là !","Oh dear, oh dear."]];
+const LAND = [["Zut !","Drat!"],["Merde !","Pardon my French."],["Quelle boulette !","What a blunder!"],["Sacrebleu !","Good heavens!"],["Nom d'une pipe !","Great Scott!"],["Oh là là !","Oh dear, oh dear."]];
+const BIG = [["Plutôt mourir que d'entendre une telle infamie ! Un zéro pointé pour votre franglais !","I'd rather die than hear such an outrage! Zero out of twenty for your Franglais!"],["Par la barbe de Molière, nettoyez-moi ce baragouinage !","By Molière's beard, clean up this gibberish!"]];
+const PRAISE = [["Magnifique !","Magnificent!"],["Voilà du beau français !","Now that's proper French!"],["Bravo, mon brave !","Bravo, my good fellow!"],["Molière serait fier !","Molière would be proud!"],["Quelle élégance !","Such elegance!"]];
+const FRANGLAIS = ["On se fait un call ASAP ?","C'est trop disruptif !","Je te forwarde le mail","Ce process n'est pas scalable","Je suis overbooké","Check ta to-do list","Faut pitcher le deck","On debriefe en off ?","C'est un no-brainer","Je suis full jusqu'à lundi","On reste focus, la team !","Le cloud, c'est trop cool"];
+const RANKS = ["Touriste égaré","Apprenti du Bescherelle","Gardien de l'accent circonflexe","Chevalier du subjonctif","Commandeur de l'imparfait","Grand Maître de la Francophonie","Immortel honoraire"];
+const rank = waves => RANKS[Math.min(RANKS.length-1, waves)];
+const pick = a => a[Math.floor(Math.random()*a.length)];
+
+/* ======================= Helpers ======================= */
+const $ = id => document.getElementById(id);
+const sky = $("sky"), optionsEl = $("options"), cannon = $("cannon");
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/œ/g,"oe").replace(/[^a-z0-9]+/g," ").trim();
+function lev(a,b){ const m=a.length,n=b.length; const d=Array.from({length:m+1},(_,i)=>[i]); for(let j=1;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[m][n]; }
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ======================= Sound & voice ======================= */
+let soundOn = true, actx = null;
+function ctx(){ if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
+function tone(freq, start, dur, type="sawtooth", vol=.07){
+  const a = ctx(); if(!a || !soundOn) return;
+  const o=a.createOscillator(), g=a.createGain(), f=a.createBiquadFilter();
+  f.type="lowpass"; f.frequency.value=1800; o.type=type; o.frequency.value=freq; o.detune.value=(Math.random()*14)-7;
+  g.gain.setValueAtTime(0,a.currentTime+start); g.gain.linearRampToValueAtTime(vol,a.currentTime+start+.02);
+  g.gain.exponentialRampToValueAtTime(.001,a.currentTime+start+dur);
+  o.connect(f).connect(g).connect(a.destination); o.start(a.currentTime+start); o.stop(a.currentTime+start+dur+.05);
+}
+const sfx = {
+  hit(){ [523,659,784,1047].forEach((f,i)=>{ tone(f,i*.07,.22); tone(f*1.005,i*.07,.22); }); },
+  boom(){ tone(110,0,.25,"square",.09); },
+  wrong(){ tone(180,0,.18,"square",.06); tone(150,.1,.2,"square",.06); },
+  land(){ tone(90,0,.5,"triangle",.14); tone(70,.15,.5,"triangle",.12); },
+  pop(){ tone(880,0,.08,"triangle",.08); tone(1320,.05,.1,"triangle",.06); },
+  fanfare(){ [392,523,659,784,659,784].forEach((f,i)=>tone(f,i*.12,.25,"sawtooth",.06)); }
+};
+let frVoice = null;
+function loadVoices(){ try{ const vs = speechSynthesis.getVoices(); frVoice = vs.find(v=>v.lang==="fr-FR") || vs.find(v=>v.lang && v.lang.startsWith("fr")) || null; }catch(e){} }
+if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function say(text, {prof=false, onend}={}){
+  if(!soundOn || !("speechSynthesis" in window)){ onend && setTimeout(onend, 1200); return; }
+  try{
+    const u = new SpeechSynthesisUtterance(text); u.lang="fr-FR"; if(frVoice) u.voice=frVoice;
+    u.rate = prof ? 1.02 : .95; u.pitch = prof ? .75 : 1;
+    if(onend) u.onend = onend;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){ onend && onend(); }
+}
+
+/* ======================= Professor reactions ======================= */
+let popTimer;
+function profSays([fr,en], mood="angry", speak=true){
+  const p = $("profPop");
+  p.querySelector(".mini").innerHTML = profSVG(mood);
+  p.querySelector(".bub").innerHTML = esc(fr) + `<small>${esc(en)}</small>`;
+  p.classList.add("show"); clearTimeout(popTimer);
+  popTimer = setTimeout(()=>p.classList.remove("show"), Math.max(1800, fr.length*55));
+  if(speak) say(fr,{prof:true});
+}
+
+/* ======================= Dialogue system ======================= */
+function dialog(steps, done){
+  let i = 0;
+  const box = $("dialog");
+  function show(){
+    const s = steps[i];
+    box.hidden = false;
+    const prof = box.querySelector(".big-prof");
+    prof.innerHTML = profSVG(s.mood||"happy");
+    prof.style.animation="none"; void prof.offsetWidth; prof.style.animation="";
+    $("dFr").textContent = s.fr;
+    $("dEn").innerHTML = s.en;
+    $("dDots").innerHTML = steps.length>1 ? steps.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join("") : "";
+    const acts = $("dActs"); acts.innerHTML = "";
+    if(s.skip && i < steps.length-1){
+      const sk = document.createElement("button"); sk.className="big alt"; sk.textContent=s.skip;
+      sk.onclick = () => { speechSynthesis && speechSynthesis.cancel(); box.hidden = true; done && done(); };
+      acts.appendChild(sk); acts.append(" ");
+    }
+    const b = document.createElement("button"); b.className="big"; b.textContent = s.btn || "Continuer";
+    b.onclick = () => { if(i < steps.length-1){ i++; show(); } else { try{speechSynthesis.cancel();}catch(e){} box.hidden = true; done && done(); } };
+    acts.appendChild(b); b.focus();
+    prof.classList.add("talking");
+    say(s.fr, {prof:true, onend:()=>prof.classList.remove("talking")});
+  }
+  show();
+}
+
+const INTRO = [
+  {fr:"Alerte générale ! Les anglicismes envahissent le ciel de Paris !", en:"Red alert! Anglicisms are invading the skies over Paris!", mood:"shock", btn:"Quelle horreur !", skip:"Passer l'intro"},
+  {fr:"Je suis Hippolyte Dupont-Circonflexe, de l'Académie française.", en:"Members of the Académie are called « les Immortels ». I'm still working on that part. In the meantime, I guard the French language with my sword, my bicorne and my monocle.", skip:"Passer l'intro"},
+  {fr:"Heureusement, l'État veille.", en:"A very serious commission, placed under the authority of the <b>Prime Minister</b>, invents official French words to replace English ones. They're published in the <i>Journal officiel</i> and collected in a database called <b>FranceTerme</b>: more than 8,000 entries, from <i>mot-dièse</i> to <i>planchodrome</i>. And the Académie française has to approve them. That means me.", skip:"Passer l'intro"},
+  {fr:"Ces mots sont obligatoires… dans l'administration.", en:"For everyone else, they are merely <i>superior</i>. Some caught on (<i>courriel</i>, <i>covoiturage</i>). Others are still waiting for their big moment (<i>mercatique</i>, anyone?).", mood:"happy", skip:"Passer l'intro"},
+  {fr:"Votre mission : défendre la Machine !", en:`<ul class="howto">
+    <li>English words float down. Shoot each one with its <b>official French term</b> before it lands.</li>
+    <li>Pick an answer (or press <b>1</b>, <b>2</b>, <b>3</b>). Tap any word to aim at it.</li>
+    <li>Every third wave, a <b>boss</b> arrives, alone and slowly. Hit it three times: choose, then <b>type</b>, then (in Mode Académicien) <b>say it out loud</b>.</li>
+    <li>Turn on <b>🎙️ Mode Académicien</b> to fire by voice, for double points.</li></ul>`, btn:"Défendre la langue !"}
+];
+
+/* ======================= Game state ======================= */
+const T = {1:[],2:[],3:[]};
+DATA.terms.forEach(t => T[t.tier].push(t));
+let S;
+function fresh(){ return { running:false, words:[], score:0, purity:100, wave:1, toSpawn:0, spawned:0, spawnTimer:0, bossDone:false,
+  combo:0, wrongStreak:0, converted:0, voiceHits:0, bosses:0, missed:{}, seen:new Set(), target:null, manual:false, nextId:1, last:0, used:new Set(), paused:false, attackTimer:3 }; }
+function pool(){
+  const w = S.wave;
+  if(w<=2) return T[1];
+  if(w<=4) return T[1].concat(T[2]);
+  if(w<=6) return T[2].concat(T[3].slice(0,20));
+  return T[2].concat(T[3], T[3]);
+}
+
+function startWave(){
+  S.toSpawn = 4 + S.wave*2; S.spawned = 0; S.spawnTimer = .8; S.bossDone = S.wave % 3 !== 0;
+  $("wave").textContent = S.wave;
+  banner(S.wave % 3 === 0 ? `Vague ${S.wave} : un boss approche !` : `Vague ${S.wave}`);
+}
+function banner(text){ const b=$("bannerText"); b.textContent=text; b.classList.remove("show"); void b.offsetWidth; b.classList.add("show"); }
+
+function makeEl(cls, html){ const el=document.createElement("div"); el.className=cls; el.innerHTML=html; sky.appendChild(el); return el; }
+function spawnTerm(t, opts={}){
+  const isBoss = !!opts.boss;
+  const el = makeEl("word"+(isBoss?" boss":""), `<span class="eyes">ò_ó</span><span class="txt"></span>${isBoss?'<span class="hp">♥♥♥</span>':''}`);
+  el.querySelector(".txt").textContent = t.en;
+  const W = sky.clientWidth, ew = el.offsetWidth;
+  const w = { kind:isBoss?"boss":"term", t, el, hp:isBoss?3:1,
+    x: opts.x!=null ? Math.max(4, Math.min(W-ew-4, opts.x)) : 10 + Math.random()*Math.max(10, W-ew-20),
+    y: opts.y!=null ? opts.y : -el.offsetHeight-10,
+    speed: isBoss ? .012 : (.045 + Math.min(S.wave,10)*.008 + Math.random()*.02), locked:false, dead:false, wobble:Math.random()*6 };
+  el.addEventListener("pointerdown", e => { e.preventDefault(); if(!w.dead){ S.manual = true; setTarget(w, true); } });
+  S.words.push(w); return w;
+}
+function spawnRandom(){
+  const p = pool().filter(t => !S.words.some(w=>w.t===t));
+  let fresh = p.filter(t=>!S.used.has(t.en)); if(!fresh.length){ S.used.clear(); fresh = p; }
+  const t = pick(fresh); S.used.add(t.en); return spawnTerm(t);
+}
+function spawnFranglais(from){
+  const el = makeEl("franglais", "");
+  el.append(pick(FRANGLAIS));
+  const w = { kind:"fr", el, x: Math.max(4, Math.min(sky.clientWidth-el.offsetWidth-4, from.x + (Math.random()*120-60))), y: from.y + 40,
+    speed:.11, dead:false, locked:false, wobble:0 };
+  el.addEventListener("pointerdown", e => { e.preventDefault(); if(!w.dead) popFranglais(w); });
+  S.words.push(w);
+}
+
+/* ======================= Targeting & answer UI ======================= */
+const targets = () => S.words.filter(w=>!w.dead && w.kind!=="fr");
+function setTarget(w, force=false){
+  if(S.target === w && !force) return;
+  S.words.forEach(x=>x.el.classList.toggle("target", x===w));
+  S.target = w; renderAnswer();
+}
+function stageOf(w){ if(w.kind!=="boss") return "pick"; return w.hp===3 ? "decoy" : w.hp===2 ? "type" : (voiceOn ? "voice" : "decoy"); }
+function renderAnswer(){
+  optionsEl.innerHTML=""; $("typeBox").classList.remove("on"); $("hint").classList.remove("on");
+  optionsEl.style.display="";
+  const w = S.target;
+  if(!w){ $("prompt").textContent = S.running ? "En attente des anglicismes…" : ""; return; }
+  const st = stageOf(w);
+  if(st==="type"){
+    optionsEl.style.display="none";
+    $("prompt").innerHTML = `Boss « ${esc(w.t.en)} » : tapez le terme ! <em>(hit 2 of 3)</em>`;
+    $("typeBox").classList.add("on"); const inp=$("typeInput"); inp.value=""; inp.placeholder="Écrivez-le en français…";
+    w.reveal = w.reveal || 1; showHint(w);
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    return;
+  }
+  let choices;
+  if(w.kind==="boss"){
+    choices = [w.t.fr, ...w.t.decoys];
+    $("prompt").innerHTML = st==="voice"
+      ? `Boss « ${esc(w.t.en)} » : dites-le à voix haute ! <em>(×3 points, or pick it)</em>`
+      : `Boss « ${esc(w.t.en)} » : attention aux faux amis ! <em>(hit ${4-w.hp} of 3)</em>`;
+  } else {
+    const same = (T[w.t.tier]||[]).filter(t=>t.fr!==w.t.fr);
+    choices = [w.t.fr, ...shuffle(same.slice()).slice(0,2).map(t=>t.fr)];
+    $("prompt").textContent = `Cible : « ${w.t.en} »`;
+  }
+  shuffle(choices).forEach((fr,i)=>{
+    const b=document.createElement("button"); b.className="opt"; b.innerHTML=`<kbd>${i+1}</kbd>`; b.append(fr);
+    b.onclick = () => choose(b, fr); optionsEl.appendChild(b);
+  });
+}
+function showHint(w){
+  const fr = w.t.fr; let n = 0;
+  const h = [...fr].map(c => /[\s\-']/.test(c) ? (c===" "?"  ":c) : (n++ < w.reveal || (w.reveal>1 && Math.random()<.35) ? c : "_")).join("");
+  const words = fr.split(" ").map(s=>s[0]+"_".repeat(Math.max(0,s.length-1))).join("  ");
+  $("hint").textContent = w.reveal>1 ? h : words; $("hint").classList.add("on");
+}
+
+function choose(btn, fr){
+  if(!S.running || !S.target || S.target.locked || S.paused) return;
+  const w = S.target;
+  if(fr === w.t.fr){ btn.classList.add("right"); fire(w,false); }
+  else { btn.classList.add("wrong"); btn.disabled=true; mistake(w); }
+}
+function typed(){
+  const w = S.target; if(!w || w.locked || !S.running || S.paused) return;
+  const a = norm($("typeInput").value), b = norm(w.t.fr);
+  if(!a) return;
+  if(a===b || lev(a,b) <= Math.floor(b.length/9)){ fire(w,false); }
+  else { mistake(w); w.reveal = (w.reveal||1) + 3; showHint(w); $("typeInput").select(); }
+}
+$("typeFire").onclick = typed;
+$("typeInput").addEventListener("keydown", e => { if(e.key==="Enter"){ e.preventDefault(); typed(); } });
+
+function mistake(w){
+  S.combo=0; S.wrongStreak++; S.purity -= w.kind==="boss" ? 8 : 5; S.missed[w.t.en]=(S.missed[w.t.en]||0)+1;
+  shakeMachine(); sfx.wrong();
+  profSays((S.wrongStreak>=3 || w.kind==="boss") && Math.random()<.6 ? pick(BIG) : pick(WRONG), "angry");
+  if(S.wrongStreak>=3) S.wrongStreak=0;
+  hud();
+}
+
+/* ======================= Firing ======================= */
+function fire(w, byVoice){
+  w.locked = true;
+  const W=sky.clientWidth, H=sky.clientHeight;
+  const tx=w.x+w.el.offsetWidth/2, ty=w.y+w.el.offsetHeight/2;
+  const ang = Math.atan2(tx-W/2, H-ty)*180/Math.PI;
+  cannon.style.transform = `rotate(${Math.max(-70,Math.min(70,ang))}deg)`;
+  sfx.boom();
+  const ball = makeEl("ball","");
+  ball.animate([{transform:`translate(${W/2-8}px,${H}px)`},{transform:`translate(${tx-8}px,${ty-8}px)`}],{duration:260,easing:"ease-in"}).onfinish = () => { ball.remove(); impact(w, byVoice); };
+}
+function floatText(cls, txt, x, y){
+  const s = makeEl(cls,""); s.textContent=txt; s.style.left=x+"px"; s.style.top=y+"px";
+  s.animate([{opacity:1,transform:"translateY(0)"},{opacity:0,transform:"translateY(-40px)"}],{duration:1000}).onfinish=()=>s.remove();
+}
+function impact(w, byVoice){
+  if(w.dead) return;
+  const cx = w.x + w.el.offsetWidth/2, cy = w.y + w.el.offsetHeight/2;
+  puffs(cx, cy); S.wrongStreak = 0;
+  if(w.kind==="boss" && w.hp>1){
+    w.hp--; w.locked=false;
+    w.el.querySelector(".hp").textContent = "♥".repeat(w.hp);
+    S.score += byVoice ? 60 : 30; floatText("pts", `+${byVoice?60:30}`, cx, cy-30);
+    sfx.wrong();
+    if(w.hp===2) profSays(["Il chancelle ! Maintenant, écrivez-le !","It's wobbling! Now type it!"],"shock",false);
+    if(S.target===w) renderAnswer(); hud(); return;
+  }
+  w.dead = true; S.combo++; S.converted++; if(byVoice) S.voiceHits++;
+  if(w.kind==="boss"){ S.bosses++; S.bossDone = true; S.spawnTimer = 2; }
+  const mult = Math.min(5, 1+Math.floor(S.combo/3));
+  const pts = (w.kind==="boss"?150:10) * mult * (byVoice ? (w.kind==="boss"?3:2) : 1);
+  S.score += pts; floatText("pts", `+${pts}`, cx, cy-30);
+  const el = w.el; el.classList.remove("target"); el.classList.add("converted");
+  el.querySelector(".eyes").textContent="^‿^"; el.querySelector(".txt").textContent=w.t.fr;
+  const hp=el.querySelector(".hp"); if(hp) hp.remove();
+  el.appendChild(Object.assign(document.createElement("span"),{className:"beret"}));
+  requestAnimationFrame(()=>{ el.style.transform=`translate(${w.x}px,${w.y-60}px)`; el.style.opacity=0; });
+  setTimeout(()=>el.remove(),1500);
+  sfx.hit();
+  if(w.kind==="boss"){ sfx.fanfare(); banner("Boss francisé !"); profSays(pick(PRAISE),"happy"); }
+  else if(S.combo>0 && S.combo%5===0){ profSays(pick(PRAISE),"happy"); }
+  else say(w.t.fr);
+  if(!S.seen.has(w.t.en)){ S.seen.add(w.t.en); showFact(w.t); }
+  S.words = S.words.filter(x=>x!==w);
+  if(S.target===w){ S.target=null; S.manual=false; }
+  hud();
+}
+function popFranglais(w){
+  w.dead=true; S.words=S.words.filter(x=>x!==w);
+  puffs(w.x+w.el.offsetWidth/2, w.y+10); sfx.pop(); S.score+=5;
+  floatText("pts","+5", w.x, w.y-10); w.el.remove(); hud();
+}
+function puffs(x,y){
+  for(let i=0;i<8;i++){
+    const p = makeEl("puff",""); const a=Math.random()*Math.PI*2, d=20+Math.random()*30;
+    p.animate([{transform:`translate(${x}px,${y}px) scale(.6)`,opacity:1},{transform:`translate(${x+Math.cos(a)*d}px,${y+Math.sin(a)*d}px) scale(1.8)`,opacity:0}],{duration:600,easing:"ease-out"}).onfinish=()=>p.remove();
+  }
+}
+let factTimer;
+function showFact(t){
+  const f=$("fact");
+  f.innerHTML = `<b>${esc(t.en)} → ${esc(t.fr)}</b>` + (JOKES[t.en]?`<br>${esc(JOKES[t.en])}`:"") + (t.d?`<i>« ${esc(t.d)} »</i>`:"") + (t.year?`<small>Journal officiel, ${esc(t.year)}</small>`:"");
+  f.classList.add("show"); clearTimeout(factTimer); factTimer=setTimeout(()=>f.classList.remove("show"),4200);
+}
+function shakeMachine(){ const m=$("machine"); m.classList.remove("shake"); void m.offsetWidth; m.classList.add("shake"); }
+
+function land(w){
+  w.dead=true; S.words=S.words.filter(x=>x!==w); w.el.remove();
+  if(w.kind==="fr"){ S.purity -= 6; profSays(["Mes oreilles saignent !","My ears are bleeding!"],"angry"); }
+  else {
+    S.purity -= w.kind==="boss" ? 35 : 15; S.combo=0; S.missed[w.t.en]=(S.missed[w.t.en]||0)+2;
+    if(w.kind==="boss") S.bossDone = true;
+    floatText("splat", w.kind==="boss" ? "Sacrebleu !" : pick(["Oh là là !","Zut !","Aïe !"]), Math.max(0,w.x), sky.clientHeight-40);
+    profSays(w.kind==="boss" ? pick(BIG) : pick(LAND), "angry");
+  }
+  shakeMachine(); sfx.land();
+  if(S.target===w){ S.target=null; S.manual=false; }
+  hud();
+}
+function hud(){
+  S.purity = Math.max(0, Math.min(100, S.purity));
+  $("score").textContent = S.score; $("gaugeFill").style.width = S.purity+"%";
+  if(S.purity<=0 && S.running) gameOver();
+}
+
+/* ======================= Main loop ======================= */
+function loop(t){
+  if(!S.running) return;
+  const dt = Math.min(.05, (t-(S.last||t))/1000); S.last = t;
+  if(S.paused){ requestAnimationFrame(loop); return; }
+  const H = sky.clientHeight;
+  S.spawnTimer -= dt;
+  if(S.spawned < S.toSpawn && S.spawnTimer <= 0){
+    const bossAlive = S.words.some(w=>w.kind==="boss");
+    const bossDue = !S.bossDone && S.spawned === Math.floor(S.toSpawn/2);
+    if(bossAlive){ /* the boss fights alone: hold all other words */ }
+    else if(bossDue){
+      if(targets().length===0){
+        const b = pick(DATA.bosses.filter(b=>!S.used.has(b.en))) || pick(DATA.bosses); S.used.add(b.en);
+        spawnTerm(b,{boss:true, y:70}); S.spawned++;
+        banner("Le boss arrive !");
+      }
+    } else { spawnRandom(); S.spawned++; S.spawnTimer = Math.max(.9, 2.6 - S.wave*.16) + Math.random()*.8; }
+  }
+  for(const w of [...S.words]){
+    if(w.dead) continue;
+    if(!w.locked) w.y += w.speed*H*dt*(w.kind==='boss' && stageOf(w)==='type' ? .5 : 1);
+    w.wobble += dt*2;
+    w.el.style.transform = `translate(${w.x + (w.kind==="fr"?0:Math.sin(w.wobble)*6)}px,${w.y}px) rotate(${w.kind==="fr"?0:Math.sin(w.wobble*.8)*3}deg)`;
+    if(w.y + w.el.offsetHeight >= H-4 && !w.locked) land(w);
+  }
+  if(!S.running) return;
+  if(!S.target || S.target.dead || !S.manual){
+    const ts = targets(); const low = ts.length ? ts.reduce((a,b)=>b.y>a.y?b:a) : null;
+    // don't yank the target away while the player is typing for a boss
+    if(!(S.target && !S.target.dead && stageOf(S.target)==="type")) setTarget(low);
+    else if(S.target.dead) setTarget(low);
+  }
+  if(S.spawned>=S.toSpawn && S.words.length===0 && S.bossDone){ waveCleared(); return; }
+  requestAnimationFrame(loop);
+}
+
+function waveCleared(){
+  S.paused = true; S.purity = Math.min(100, S.purity+15); hud();
+  const r = rank(S.wave), lines = [
+    ["Bravo ! La vague est repoussée !", `The skies are clear, for now. For services rendered to the French language, you are promoted to: <b>${r}</b>.`],
+    ["Magnifique ! Molière applaudit depuis sa tombe.", `Your new title: <b>${r}</b>. Purity restored a little. Don't let it go to your head.`],
+    ["Pas mal… pour un débutant.", `Promotion: <b>${r}</b>. The next wave is faster. Much faster. I've heard rumours of « growth hacking ».`],
+    ["Splendide ! Je vous décernerais bien une épée.", `Rank: <b>${r}</b>. Académie swords are custom-made, so you'll have to wait.`]
+  ];
+  const [fr,en] = lines[(S.wave-1) % lines.length];
+  sfx.fanfare();
+  dialog([{fr, en: en + (S.wave%3===2 ? "<br><br>⚠️ Next wave: a <b>boss</b>. Choose, type, then shout." : ""), mood:"happy", btn:`Vague ${S.wave+1}`}], () => {
+    S.wave++; S.paused=false; S.last=0; S.target=null; S.manual=false; startWave(); requestAnimationFrame(loop);
+  });
+}
+
+/* ======================= Voice recognition ======================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, voiceOn=false;
+function heard(text){ const h=$("heard"); h.textContent="J'ai entendu : « "+text+" »"; h.classList.add("show"); clearTimeout(h._t); h._t=setTimeout(()=>h.classList.remove("show"),1800); }
+function setupVoice(){
+  if(!SR) return false;
+  rec = new SR(); rec.lang="fr-FR"; rec.continuous=true; rec.interimResults=true;
+  rec.onresult = e => {
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const txt=e.results[i][0].transcript, n=norm(txt); heard(txt.trim());
+      if(!S || !S.running || S.paused) continue;
+      const hit = targets().find(w=>!w.locked && n.includes(norm(w.t.fr)));
+      if(hit){ fire(hit,true); try{rec.abort();}catch(_){} break; }
+    }
+  };
+  rec.onend = () => { if(voiceOn){ try{rec.start();}catch(_){} } };
+  rec.onerror = e => { if(e.error==="not-allowed"||e.error==="service-not-allowed"){ voiceOn=false; $("voiceBtn").setAttribute("aria-pressed","false"); heard("Micro refusé : autorisez le micro pour jouer à la voix."); } };
+  return true;
+}
+$("voiceBtn").onclick = () => {
+  if(!rec && !setupVoice()){ heard("La reconnaissance vocale n'est pas disponible dans ce navigateur. Essayez Chrome."); return; }
+  voiceOn=!voiceOn; $("voiceBtn").setAttribute("aria-pressed",voiceOn);
+  if(voiceOn){ try{rec.start(); heard("Je vous écoute… dites le mot français !");}catch(_){} } else { try{rec.stop();}catch(_){} }
+  if(S && S.target) renderAnswer();
+};
+$("soundBtn").onclick = () => { soundOn=!soundOn; $("soundBtn").setAttribute("aria-pressed",soundOn); $("soundBtn").textContent = soundOn?"🔊 Son et voix":"🔇 Son et voix"; if(!soundOn) try{speechSynthesis.cancel();}catch(e){} };
+
+document.addEventListener("keydown", e => {
+  if(document.activeElement && document.activeElement.tagName==="INPUT") return;
+  const i=["1","2","3"].indexOf(e.key);
+  if(i>=0){ const b=optionsEl.children[i]; if(b && !b.disabled) b.click(); }
+});
+
+/* ======================= Start / game over ======================= */
+function start(){
+  ctx(); if(actx && actx.state==="suspended") actx.resume();
+  sky.querySelectorAll(".word,.ball,.puff,.splat,.franglais,.pts").forEach(n=>n.remove());
+  S = fresh(); S.running = true; cannon.style.transform="";
+  $("over").hidden = true; hud(); renderAnswer(); startWave(); requestAnimationFrame(loop);
+}
+function weakest(){ const e = Object.entries(S.missed).sort((a,b)=>b[1]-a[1])[0]; if(!e) return null;
+  const t = DATA.terms.concat(DATA.bosses).find(t=>t.en===e[0]); return t; }
+let shareBlob = null, shareText = "";
+function gameOver(){
+  S.running=false; try{ if(voiceOn) rec.stop(); }catch(_){}
+  const wk = weakest(), r = rank(S.wave-1);
+  shareText = `🎩🇫🇷 J'ai francisé ${S.converted} anglicismes dans Opération La Défense (score ${S.score}, vague ${S.wave}). Mon grade : ${r}.` + (wk?` Mon point faible : « ${wk.en} » (= ${wk.fr}).`:"") + " Et vous, vous dites « mot-dièse » ?";
+  const verdict = S.score > 1500 ? ["Vous n'avez pas démérité. Presque digne de l'Académie.","Not bad at all. Almost worthy of the Académie."]
+    : S.score > 500 ? ["La Machine a cédé, mais l'honneur est sauf.","The Machine fell, but your honour is intact."]
+    : pick(BIG);
+  dialog([{fr:verdict[0], en:verdict[1] + `<br><br>Final rank: <b>${r}</b>.` + (wk?` Your nemesis: <b>${esc(wk.en)}</b>, which you should call « ${esc(wk.fr)} ».`:""), mood: S.score>500?"happy":"angry", btn:"Voir mon score"}], showOver);
+}
+async function showOver(){
+  $("over").hidden=false; $("overTitle").textContent = `${S.converted} anglicismes francisés`;
+  $("overStats").textContent = `Score ${S.score}, vague ${S.wave}, ${S.bosses} boss vaincu${S.bosses>1?"s":""}` + (S.voiceHits?`, ${S.voiceHits} tirs à la voix`:"") + ".";
+  $("saveBtn").textContent="Enregistrer l'image"; $("copyBtn").textContent="Copier le texte";
+  $("shareImg").removeAttribute("src");
+  try{ shareBlob = await makeCard(); $("shareImg").src = URL.createObjectURL(shareBlob); }catch(e){ console.error(e); shareBlob=null; }
+  $("againBtn").focus();
+}
+
+/* ======================= Share card (canvas → PNG) ======================= */
+if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();};}
+function wrap(c, text, x, y, maxW, lh){
+  const words=text.split(" "); let line=""; for(const w of words){ const test=line?line+" "+w:w;
+    if(c.measureText(test).width>maxW && line){ c.fillText(line,x,y); line=w; y+=lh; } else line=test; }
+  c.fillText(line,x,y); return y;
+}
+function loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+async function makeCard(withProf=true){
+  try{ await Promise.all([document.fonts.load('80px Limelight'), document.fonts.load('800 40px "Alegreya Sans"'), document.fonts.load('400 30px "Alegreya Sans"')]); }catch(e){}
+  const W=1080, H=1350, cv=document.createElement("canvas"); cv.width=W; cv.height=H; const c=cv.getContext("2d");
+  const g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,"#1c2848"); g.addColorStop(1,"#5b5f86"); c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.save(); c.globalAlpha=.4; c.translate(0,H-420); c.scale(W/900,420/300); c.fillStyle="#0b1020";
+  c.fill(new Path2D(document.querySelector("#skyline path").getAttribute("d"))); c.restore();
+  // brass frame
+  c.lineWidth=18; c.strokeStyle="#c9a34a"; c.strokeRect(24,24,W-48,H-48);
+  c.lineWidth=4; c.strokeStyle="#7a5a1e"; c.strokeRect(44,44,W-88,H-88);
+  c.textAlign="center"; c.fillStyle="#f0d58a"; c.font='92px Limelight'; c.fillText("Opération",W/2,170); c.fillText("La Défense",W/2,270);
+  c.font='italic 400 34px "Alegreya Sans"'; c.fillStyle="#f6ecd2"; c.fillText("Les anglicismes n'ont qu'à bien se tenir",W/2,330);
+  // paper card
+  c.fillStyle="#efe3c4"; c.strokeStyle="#2a1d14"; c.lineWidth=6;
+  c.beginPath(); c.roundRect(110,380,W-220,560,26); c.fill(); c.stroke();
+  c.fillStyle="#2b4ea2"; c.font='800 210px "Alegreya Sans"'; c.fillText(String(S.converted),W/2,600);
+  c.fillStyle="#2a1d14"; c.font='800 46px "Alegreya Sans"'; c.fillText("anglicismes francisés",W/2,665);
+  c.font='400 36px "Alegreya Sans"'; c.fillText(`Score ${S.score}   |   Vague ${S.wave}   |   ${S.bosses} boss`,W/2,730);
+  c.fillStyle="#c8323b"; c.font='44px Limelight'; c.fillText(rank(S.wave-1),W/2,808);
+  const wk=weakest(); c.fillStyle="#2a1d14"; c.font='italic 400 32px "Alegreya Sans"';
+  if(wk) wrap(c, `Point faible : « ${wk.en} », alias « ${wk.fr} »`, W/2, 872, W-300, 40);
+  // professor + speech bubble
+  if(withProf){ const img=await loadImg("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(profSVG(S.score>500?"happy":"angry"))); c.drawImage(img,100,950,250,300); }
+  c.fillStyle="#fff"; c.strokeStyle="#2a1d14"; c.lineWidth=5; c.beginPath(); c.roundRect(400,990,580,180,24); c.fill(); c.stroke();
+  c.beginPath(); c.moveTo(410,1110); c.lineTo(360,1140); c.lineTo(420,1140); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle="#2a1d14"; c.textAlign="left"; c.font='800 38px "Alegreya Sans"';
+  wrap(c, S.score>1500?"« Presque digne de l'Académie ! »":S.score>500?"« L'honneur est sauf ! »":"« Un zéro pointé pour votre franglais ! »", 430, 1060, 520, 46);
+  c.font='400 26px "Alegreya Sans"'; c.fillText("Et vous, vous dites « mot-dièse » ?",430,1145);
+  c.textAlign="center"; c.fillStyle="#f6ecd2"; c.font='400 26px "Alegreya Sans"';
+  c.fillText("Termes officiels : base FranceTerme, ministère de la Culture",W/2,H-62);
+  return await new Promise((res,rej)=>{ try{ cv.toBlob(b=>b?res(b):rej(new Error("toBlob")),"image/png"); }catch(e){ if(withProf) makeCard(false).then(res,rej); else rej(e); } });
+}
+
+const downloadsP = (window.claude && typeof window.claude.use==="function") ? window.claude.use("downloads").catch(()=>null) : Promise.resolve(null);
+$("saveBtn").onclick = async () => {
+  if(!shareBlob) return;
+  const note=$("saveNote"), name="operation-la-defense-score.png";
+  const dl = await downloadsP;
+  if(dl){
+    try{ await dl.save({filename:name, data:shareBlob}); note.textContent="Image enregistrée."; }
+    catch(e){ note.textContent = e && e.code==="declined" ? "Enregistrement annulé." : "L'enregistrement n'est pas disponible ici : appuyez longuement sur l'image."; }
+    return;
+  }
+  const file = new File([shareBlob], name, {type:"image/png"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], text:shareText}); return; }catch(e){ if(e.name==="AbortError") return; }
+  }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(shareBlob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  note.textContent="Image téléchargée.";
+};
+$("copyBtn").onclick = async () => {
+  try{ await navigator.clipboard.writeText(shareText); $("copyBtn").textContent="Copié !"; }
+  catch(e){ $("saveNote").textContent = shareText; }
+};
+$("againBtn").onclick = start;
+
+/* ======================= Boot ======================= */
+S = fresh();
+$("prompt").textContent = "";
+dialog(INTRO, start);
+</script>
+</body>
+</html>
