@@ -105,6 +105,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
 #controls{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
 .toggle{background:#2a1d14;color:var(--brass-hi);border:2px solid var(--ink);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700}
 .toggle[aria-pressed="true"]{background:var(--verdigris);color:#08201c}
+.toggle[hidden]{display:none}
+/* Sits at the right end of the HUD, outside the playfield, and above the dialogue
+   screens so players can enlarge the game during the intro */
+#fsBtn{position:absolute;right:10px;top:9px;z-index:11}
+#hud{padding-right:138px}
+@media (max-width:600px){ #fsTxt{display:none} #fsBtn{padding:3px 9px;font-size:15px} #hud{padding-right:56px} }
 
 /* Dialogue with the professor */
 .screen{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:#0d1224e0;overflow:auto}
@@ -145,11 +151,22 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
   #dialog .speech{margin-bottom:0;border-radius:18px}
   #profPop .bub{font-size:14px;max-width:200px}
 }
+/* Short screens and embeds: tighten the machine so the sky keeps its room */
+@media (max-height:640px){
+  #hud{padding-top:5px;padding-bottom:5px}
+  #fsBtn{top:6px}
+  #machine{padding:16px 12px 6px}
+  #prompt{margin:2px 0 5px;font-size:14px}
+  .opt{min-height:44px;padding-top:6px;padding-bottom:6px}
+  #controls{margin-top:6px}
+  .toggle{padding:3px 10px;font-size:12px}
+}
 @media (prefers-reduced-motion: reduce){ #dialog .big-prof{animation:none} .talking .mouth{animation:none} }
 </style>
 </head>
 <body>
 <div id="game">
+  <button class="toggle" id="fsBtn" aria-pressed="false" aria-label="Plein écran" title="Plein écran"><span id="fsIco">⛶</span><span id="fsTxt"> Plein écran</span></button>
   <div id="hud">
     <div class="plate"><small>Score</small> <span id="score">0</span></div>
     <div id="gaugeWrap"><span>Pureté linguistique</span><div id="gauge"><div id="gaugeFill"></div></div></div>
@@ -642,6 +659,21 @@ $("voiceBtn").onclick = () => {
   if(S && S.target) renderAnswer();
 };
 $("soundBtn").onclick = () => { soundOn=!soundOn; $("soundBtn").setAttribute("aria-pressed",soundOn); $("soundBtn").textContent = soundOn?"🔊 Son et voix":"🔇 Son et voix"; if(!soundOn) try{speechSynthesis.cancel();}catch(e){} };
+
+/* Full screen: native when allowed; inside an iframe without permission, open the game in a new tab */
+const fsBtn = $("fsBtn"), framed = (() => { try { return window.self !== window.top; } catch(_) { return true; } })();
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+const fsOK = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+if(!fsOK && !framed) fsBtn.hidden = true;
+fsBtn.onclick = () => {
+  const d = document.documentElement;
+  if(!fsOK){ window.open(location.href, "_blank", "noopener"); return; }
+  if(fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else { const r = (d.requestFullscreen || d.webkitRequestFullscreen).call(d); if(r && r.catch) r.catch(() => { if(framed) window.open(location.href, "_blank", "noopener"); }); }
+};
+const fsSync = () => { const on = !!fsEl(); fsBtn.setAttribute("aria-pressed", on); const t = on ? "Quitter le plein écran" : "Plein écran";
+  $("fsIco").textContent = on ? "✕" : "⛶"; fsBtn.setAttribute("aria-label", t); fsBtn.title = t; };
+document.addEventListener("fullscreenchange", fsSync); document.addEventListener("webkitfullscreenchange", fsSync);
 
 document.addEventListener("keydown", e => {
   if(document.activeElement && document.activeElement.tagName==="INPUT") return;
