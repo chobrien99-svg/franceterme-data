@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Opération La Défense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Alegreya+Sans:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#2c3d63; --sky-bot:#5b5f86; --brass:#c9a34a; --brass-hi:#f0d58a; --brass-lo:#7a5a1e;
+  --copper:#b0643a; --verdigris:#4f9a8a; --paper:#efe3c4; --ink:#2a1d14; --habit:#2f5d3a;
+  --bleu:#2b4ea2; --rouge:#c8323b; --text:#f6ecd2;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --sky-top:#141c33; --sky-bot:#34385a; } }
+:root[data-theme="dark"]{ --sky-top:#141c33; --sky-bot:#34385a; }
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--sky-top);color:var(--text);font-family:"Alegreya Sans",system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outline-offset:2px}
+#game{position:relative;height:100%;display:flex;flex-direction:column;max-width:900px;margin:0 auto}
+
+/* HUD */
+#hud{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;background:linear-gradient(#3a2a1a,#24180e);border-bottom:3px solid var(--brass-lo);z-index:5}
+.plate{background:linear-gradient(var(--brass-hi),var(--brass) 45%,var(--brass-lo));color:var(--ink);border-radius:6px;padding:4px 10px;font-weight:800;box-shadow:inset 0 0 0 1px #00000040;font-size:15px;white-space:nowrap}
+.plate small{font-weight:700;opacity:.75}
+#gaugeWrap{display:flex;align-items:center;gap:8px;flex:1;max-width:320px}
+#gaugeWrap span{font-size:13px;color:var(--brass-hi);white-space:nowrap}
+#gauge{flex:1;height:16px;border-radius:9px;background:#120c06;border:2px solid var(--brass);overflow:hidden}
+#gaugeFill{height:100%;width:100%;background:linear-gradient(90deg,var(--bleu) 0 33%,#f4f1ea 33% 66%,var(--rouge) 66%);transition:width .3s}
+
+/* Sky */
+#sky{position:relative;flex:1;overflow:hidden;background:linear-gradient(var(--sky-top),var(--sky-bot))}
+#skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:46%;opacity:.35;pointer-events:none}
+.word{position:absolute;left:0;top:0;padding:6px 12px 7px;background:var(--paper);color:var(--ink);border-radius:4px 14px 4px 14px;font-weight:800;font-size:18px;white-space:nowrap;box-shadow:0 3px 0 #00000055;border:2px solid var(--ink);will-change:transform;cursor:crosshair}
+.word::before{content:"";position:absolute;left:50%;top:-34px;width:2px;height:30px;background:#ffffff70}
+.word::after{content:"";position:absolute;left:calc(50% - 13px);top:-58px;width:26px;height:28px;border-radius:50% 50% 45% 45%;background:var(--copper);box-shadow:inset -4px -4px 0 #0003}
+.word .eyes{display:inline-block;margin-right:6px;font-size:13px;letter-spacing:-1px}
+.word.target{outline:3px dashed var(--brass-hi);outline-offset:4px}
+.word.boss{font-size:24px;padding:10px 18px;background:#f3d9c9;border-width:3px}
+.word.boss::after{width:44px;left:calc(50% - 22px);top:-70px;height:40px;background:var(--rouge)}
+.word .hp{display:inline-block;margin-left:8px;color:var(--rouge);font-size:16px}
+.word.converted{background:#fff;border-color:var(--bleu);color:var(--bleu);transition:opacity .9s .5s, transform .9s ease-out}
+.word.converted::after{background:var(--bleu)}
+.franglais{position:absolute;left:0;top:0;padding:5px 11px;border-radius:16px;background:#ffe6ee;color:#7a1430;border:2px dashed #7a1430;font-weight:700;font-style:italic;font-size:15px;white-space:nowrap;cursor:pointer;z-index:2}
+.franglais::before{content:"🗯 ";font-style:normal}
+.beret{position:absolute;left:50%;top:-16px;transform:translateX(-50%) rotate(-12deg);width:34px;height:14px;background:#1b1b2e;border-radius:50% 50% 30% 30%}
+.beret::after{content:"";position:absolute;left:50%;top:-5px;width:3px;height:6px;background:#1b1b2e}
+.ball{position:absolute;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--brass) 45%,var(--brass-lo));z-index:4;pointer-events:none}
+.puff{position:absolute;width:14px;height:14px;border-radius:50%;background:#ffffffcc;pointer-events:none;z-index:4}
+.splat{position:absolute;font-family:Limelight,serif;color:var(--rouge);font-size:22px;pointer-events:none;z-index:4;text-shadow:0 2px 0 #0008}
+.pts{position:absolute;font-weight:800;color:var(--brass-hi);font-size:18px;pointer-events:none;z-index:4;text-shadow:0 2px 0 #0008}
+
+#banner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:6;text-align:center}
+#banner div{font-family:Limelight,serif;font-size:clamp(30px,7vw,58px);color:var(--brass-hi);text-shadow:0 4px 0 var(--ink);opacity:0;padding:0 12px}
+#banner div.show{animation:bannerIn 1.8s ease-out}
+@keyframes bannerIn{0%{opacity:0;transform:scale(.6)}20%{opacity:1;transform:scale(1.05)}80%{opacity:1}100%{opacity:0;transform:scale(1)}}
+
+#fact{position:absolute;left:12px;right:12px;bottom:12px;max-width:460px;margin:0 auto;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:8px;padding:8px 12px;font-size:14px;line-height:1.35;z-index:5;transform:translateY(160%);transition:transform .35s}
+#fact.show{transform:translateY(0)}
+#fact b{color:var(--bleu);font-size:16px}
+#fact i{display:block;margin-top:3px}
+#fact small{opacity:.7}
+
+#heard{position:absolute;right:12px;top:12px;max-width:60%;background:#000a;color:var(--paper);padding:5px 10px;border-radius:12px;font-size:14px;z-index:5;opacity:0;transition:opacity .3s}
+#heard.show{opacity:1}
+
+/* Professor popup in the sky */
+#profPop{position:absolute;left:8px;top:8px;display:flex;align-items:flex-start;gap:6px;z-index:7;pointer-events:none;transform:translateX(-130%);transition:transform .25s ease-out}
+#profPop.show{transform:translateX(0)}
+#profPop .mini{width:78px;height:94px;flex:none}
+#profPop .bub{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:6px 10px;max-width:250px;font-weight:800;font-size:16px;line-height:1.2;margin-top:10px;position:relative}
+#profPop .bub small{display:block;font-weight:400;font-style:italic;font-size:12px;opacity:.7;margin-top:2px}
+
+/* Machine */
+#machine{position:relative;padding:22px 12px 10px;background:
+  repeating-linear-gradient(90deg,#00000018 0 2px,transparent 2px 46px),
+  linear-gradient(var(--brass-hi),var(--brass) 18%,var(--brass-lo));
+  border-top:4px solid var(--ink);z-index:3}
+#machine.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+#cannon{position:absolute;left:50%;top:-34px;width:30px;height:56px;margin-left:-15px;transform-origin:50% 90%;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi) 40%,var(--brass-lo));border:3px solid var(--ink);border-radius:10px 10px 6px 6px;transition:transform .12s}
+#cannon::after{content:"";position:absolute;left:-12px;right:-12px;bottom:-12px;height:20px;background:var(--copper);border:3px solid var(--ink);border-radius:12px 12px 4px 4px}
+.rivets{position:absolute;top:6px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.rivets i{width:7px;height:7px;border-radius:50%;background:var(--brass-lo);box-shadow:inset 1px 1px 0 var(--brass-hi)}
+#prompt{text-align:center;color:var(--ink);font-weight:800;font-size:15px;margin:4px 0 8px;min-height:1.2em}
+#prompt em{font-weight:700;font-style:normal;opacity:.75}
+#options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opt{position:relative;min-height:54px;padding:8px 8px 8px 26px;border:3px solid var(--ink);border-radius:10px;background:linear-gradient(#3b2a19,#23170c);color:var(--paper);font-size:16px;font-weight:700;line-height:1.15;box-shadow:0 4px 0 var(--ink)}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.opt kbd{position:absolute;left:7px;top:6px;font-family:inherit;font-size:12px;color:var(--brass-hi)}
+.opt.wrong{background:var(--rouge);animation:shake .3s}
+.opt.right{background:var(--bleu)}
+.opt:disabled{opacity:.5}
+#typeBox{display:none;gap:8px}
+#typeBox.on{display:flex}
+#typeBox input{flex:1;min-width:0;font:inherit;font-size:18px;font-weight:700;padding:10px 12px;border:3px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink)}
+#typeBox button{border:3px solid var(--ink);border-radius:10px;background:var(--rouge);color:#fff;font-weight:800;font-size:17px;padding:0 16px;box-shadow:0 4px 0 var(--ink)}
+#hint{text-align:center;color:var(--ink);font-weight:800;letter-spacing:2px;font-size:15px;margin-top:6px;min-height:1em;display:none}
+#hint.on{display:block}
+#controls{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.toggle{background:#2a1d14;color:var(--brass-hi);border:2px solid var(--ink);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700}
+.toggle[aria-pressed="true"]{background:var(--verdigris);color:#08201c}
+
+/* Dialogue with the professor */
+.screen{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:#0d1224e0;overflow:auto}
+.screen[hidden]{display:none}
+#dialog .scene{display:flex;align-items:flex-end;gap:10px;max-width:640px;width:100%}
+#dialog .big-prof{width:min(38vw,210px);flex:none;animation:profIn .5s ease-out}
+@keyframes profIn{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+#dialog .speech{flex:1;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:18px 18px 18px 4px;padding:18px 18px 14px;box-shadow:0 6px 0 var(--brass-lo);margin-bottom:40px}
+#dialog .fr{font-family:Limelight,serif;font-size:clamp(21px,4.4vw,30px);line-height:1.15;color:var(--bleu);margin:0 0 8px}
+#dialog .en{font-size:16px;line-height:1.45;margin:0 0 10px}
+#dialog .en b{color:var(--rouge)}
+#dialog .who{font-size:13px;font-style:italic;opacity:.7;margin:0 0 6px}
+#dialog .acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:8px}
+.big{background:linear-gradient(var(--brass-hi),var(--brass) 50%,var(--brass-lo));color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:10px 20px;font-size:18px;font-weight:800;box-shadow:0 5px 0 var(--ink)}
+.big.alt{background:#fff}
+.howto{margin:6px 0 4px;padding-left:20px;font-size:15px;line-height:1.45}
+.dots{display:flex;gap:6px;margin-right:auto;align-items:center}
+.dots i{width:9px;height:9px;border-radius:50%;background:#0003}
+.dots i.on{background:var(--bleu)}
+.talking .mouth{animation:talk .18s infinite alternate;transform-origin:100px 132px}
+@keyframes talk{from{transform:scaleY(1)}to{transform:scaleY(.35)}}
+
+/* Game over */
+#over .card{max-width:520px;width:100%;text-align:center;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:14px;padding:18px;box-shadow:0 8px 0 var(--brass-lo)}
+#over h2{font-family:Limelight,serif;font-weight:400;font-size:clamp(26px,6vw,36px);margin:0 0 10px;color:var(--rouge)}
+#shareImg{width:100%;max-width:340px;border:3px solid var(--ink);border-radius:8px;display:block;margin:0 auto 10px;background:#ddd;aspect-ratio:4/5;object-fit:cover}
+#over p{margin:6px 0;font-size:15px}
+#over .acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+#saveNote{font-size:13px;opacity:.75;min-height:1.2em}
+
+@media (max-width:560px){
+  .word{font-size:15px}.word.boss{font-size:19px}
+  .opt{font-size:14px;min-height:60px;padding-left:22px}
+  #hud{flex-wrap:wrap}
+  #gaugeWrap{order:3;max-width:none;flex-basis:100%}
+  #dialog .scene{flex-direction:column;align-items:center}
+  #dialog .big-prof{width:130px}
+  #dialog .speech{margin-bottom:0;border-radius:18px}
+  #profPop .bub{font-size:14px;max-width:200px}
+}
+@media (prefers-reduced-motion: reduce){ #dialog .big-prof{animation:none} .talking .mouth{animation:none} }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="hud">
+    <div class="plate"><small>Score</small> <span id="score">0</span></div>
+    <div id="gaugeWrap"><span>Pureté linguistique</span><div id="gauge"><div id="gaugeFill"></div></div></div>
+    <div class="plate"><small>Vague</small> <span id="wave">1</span></div>
+  </div>
+
+  <div id="sky">
+    <svg id="skyline" viewBox="0 0 900 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path fill="#0b1020" d="M0 300V230h40v-30h30v30h50v-50h20v50h60v-20h40v20h30v-60h25v60h45V200h35v100zM420 300l40-140 8-80 6-70 6 70 8 80 40 140h-30l-24-60-24 60zM560 300v-80h40v-25h30v25h50v-40h20v40h60v-30h40v30h40v-60h25v60h35v80z"/></svg>
+    <div id="banner"><div id="bannerText"></div></div>
+    <div id="heard"></div>
+    <div id="profPop" aria-live="polite"><div class="mini"></div><div class="bub"></div></div>
+    <div id="fact"></div>
+  </div>
+
+  <div id="machine">
+    <div id="cannon"></div>
+    <div class="rivets"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="prompt"></div>
+    <div id="options"></div>
+    <div id="typeBox"><input id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Tapez le terme français"><button id="typeFire">Feu !</button></div>
+    <div id="hint"></div>
+    <div id="controls">
+      <button class="toggle" id="voiceBtn" aria-pressed="false">🎙️ Mode Académicien (voix)</button>
+      <button class="toggle" id="soundBtn" aria-pressed="true">🔊 Son et voix</button>
+    </div>
+  </div>
+
+  <div class="screen" id="dialog" hidden>
+    <div class="scene">
+      <div class="big-prof"></div>
+      <div class="speech">
+        <p class="who">Hippolyte Dupont-Circonflexe, de l'Académie (presque) française</p>
+        <p class="fr" id="dFr"></p>
+        <div class="en" id="dEn"></div>
+        <div class="acts"><div class="dots" id="dDots"></div><span id="dActs"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="over" hidden>
+    <div class="card">
+      <h2 id="overTitle">La Machine a cédé !</h2>
+      <img id="shareImg" alt="Votre carte de score">
+      <p id="overStats"></p>
+      <div class="acts">
+        <button class="big" id="saveBtn">Enregistrer l'image</button>
+        <button class="big alt" id="copyBtn">Copier le texte</button>
+        <button class="big" id="againBtn">Rejouer</button>
+      </div>
+      <p id="saveNote">Sur mobile, vous pouvez aussi appuyer longuement sur l'image pour l'enregistrer.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================= DATA (from the FranceTerme open-data XML) ======================= */
+const DATA = {"terms": [{"en": "hashtag", "fr": "mot-dièse", "year": "2013", "tier": 1, "d": "Suite signifiante de caractères sans espace commençant par le signe # (dièse), qui signale un sujet d'intérêt et est insérée dans un message par…"}, {"en": "e-mail", "fr": "courriel", "year": "2003", "tier": 1, "d": "Document informatisé qu'un utilisateur saisit, envoie ou consulte en différé par l'intermédiaire d'un réseau."}, {"en": "fake news", "fr": "infox", "year": "2020", "tier": 1, "d": "Information mensongère ou délibérément biaisée."}, {"en": "chatbot", "fr": "dialogueur", "year": "2018", "tier": 1, "d": "Logiciel spécialisé dans le dialogue en langage naturel avec un humain, qui est capable notamment de répondre à des questions ou de déclencher…"}, {"en": "big data", "fr": "mégadonnées", "year": "2014", "tier": 1, "d": "Données structurées ou non dont le très grand volume requiert des outils d'analyse adaptés."}, {"en": "blockchain", "fr": "chaîne de blocs", "year": "2017", "tier": 1, "d": "Mode d’enregistrement de données produites en continu, sous forme de blocs liés les uns aux autres dans l’ordre chronologique de leur validation,…"}, {"en": "cookie", "fr": "témoin de connexion", "year": "1999", "tier": 1, "d": "Appliquette envoyée par un serveur de la toile à un utilisateur, parfois à l'insu de celui-ci, au cours d'une connexion afin de caractériser cet…"}, {"en": "hacker", "fr": "fouineur", "year": "1999", "tier": 1, "d": "Personne passionnée d'informatique qui, par jeu, curiosité, défi personnel ou par souci de notoriété, sonde, au hasard plutôt qu'à l'aide de…"}, {"en": "start-up", "fr": "jeune pousse", "year": "2001", "tier": 1, "d": "Jeune entreprise innovante et dynamique, à croissance rapide."}, {"en": "newsletter", "fr": "infolettre", "year": "2024", "tier": 1, "d": "Bulletin périodique d'information destiné à un public déterminé, souvent diffusé par voie numérique."}, {"en": "coworking", "fr": "cotravail", "year": "2016", "tier": 1, "d": "Mode de travail consistant, pour des professionnels indépendants, à partager espace, poste de travail, expérience ou compétences."}, {"en": "e-commerce", "fr": "commerce en ligne", "year": "2000", "tier": 1, "d": "Technique d'achat et de vente à distance utilisant des procédés électroniques qui permettent la liaison directe et instantanée entre le vendeur et…"}, {"en": "e-book", "fr": "livre numérique", "year": "2012", "tier": 1, "d": "Ouvrage édité et diffusé sous forme numérique, destiné à être lu sur un écran."}, {"en": "bug", "fr": "bogue", "year": "2000", "tier": 1, "d": "Défaut de conception ou de réalisation se manifestant par des anomalies de fonctionnement."}, {"en": "software", "fr": "logiciel", "year": "2000", "tier": 1, "d": "Ensemble des programmes, procédés et règles, et éventuellement de la documentation, relatifs au fonctionnement d'un ensemble de traitement de données."}, {"en": "hardware", "fr": "matériel", "year": "2000", "tier": 1, "d": "Ensemble des éléments physiques employés pour le traitement de données."}, {"en": "smiley", "fr": "frimousse", "year": "1999", "tier": 1, "d": "Dans un message, association facétieuse de quelques caractères typographiques qui évoquent un visage expressif."}, {"en": "think tank", "fr": "laboratoire d'idées", "year": "1998", "tier": 1, "d": "Groupe plus ou moins formel dont les membres interviennent dans les débats publics sur les grands problèmes économiques et de société,…"}, {"en": "food truck", "fr": "camion de restauration", "year": "2016", "tier": 1, "d": "Camion équipé pour confectionner rapidement des mets, le plus souvent élaborés, à emporter ou à consommer sur place."}, {"en": "pop-up store", "fr": "boutique éphémère", "year": "2016", "tier": 1, "d": "Magasin conçu pour une durée de vie de quelques jours, semaines ou mois, en vue de faire connaître une marque ou un produit."}, {"en": "escape game", "fr": "jeu d'évasion", "year": "2019", "tier": 1, "d": "Jeu, construit autour d’un scénario, qui consiste à résoudre, collectivement et dans un temps limité, un problème ou une énigme afin de s’échapper…"}, {"en": "fast fashion", "fr": "mode express", "year": "2020", "tier": 1, "d": "Secteur de la mode qui repose sur un modèle économique caractérisé par le renouvellement très rapide de collections d’articles à bas prix."}, {"en": "mountain bike", "fr": "vélo tout-terrain", "year": "2000", "tier": 1, "d": ""}, {"en": "snowboard", "fr": "planche de neige", "year": "2026", "tier": 1, "d": "Planche de sport, généralement équipée de fixations pour les pieds, conçue pour permettre d’évoluer en position debout sur la neige."}, {"en": "airbag", "fr": "sac gonflable", "year": "2000", "tier": 1, "d": "Dispositif de sécurité constitué par une enveloppe souple qui, en cas de choc, se gonfle instantanément en s'interposant entre l'occupant et les…"}, {"en": "firewall", "fr": "pare-feu", "year": "2022", "tier": 1, "d": "Dispositif informatique qui filtre les flux d’informations entre un réseau interne à un organisme et un réseau externe, en vue de neutraliser les…"}, {"en": "malware", "fr": "logiciel malveillant", "year": "2005", "tier": 1, "d": "Ensemble de programmes conçu par un pirate pour être implanté dans un système afin d'y déclencher une opération non autorisée ou d'en perturber le…"}, {"en": "search engine", "fr": "moteur de recherche", "year": "2000", "tier": 1, "d": "Système d'exploitation de banque de données, et, par extension, serveur spécialisé permettant d'accéder sur la toile à des ressources (pages,…"}, {"en": "touch screen", "fr": "écran tactile", "year": "2000", "tier": 1, "d": "Écran muni d'un dispositif qui permet de sélectionner certaines de ses zones par contact."}, {"en": "drag and drop", "fr": "glisser-déposer", "year": "1999", "tier": 1, "d": "Action par laquelle l'utilisateur sélectionne un objet à l'écran, le déplace jusqu'à une autre position, puis le lâche pour déclencher une action…"}, {"en": "win-win", "fr": "gagnant-gagnant", "year": "2005", "tier": 1, "d": "Se dit du résultat d'une négociation favorable à chacune des parties."}, {"en": "speed dating", "fr": "rencontre express", "year": "2010", "tier": 1, "d": "Organisation de rencontres croisées au sein d'un groupe dans un temps limité."}, {"en": "car pool", "fr": "covoiturage", "year": "2000", "tier": 1, "d": "Utilisation en commun d'une voiture particulière."}, {"en": "camping-car", "fr": "autocaravane", "year": "2000", "tier": 1, "d": "Caravane autotractée ou véhicule automobile dont l'intérieur est équipé pour le séjour."}, {"en": "know-how", "fr": "savoir-faire", "year": "2000", "tier": 1, "d": ""}, {"en": "call center", "fr": "centre d'appels", "year": "2003", "tier": 1, "d": "Ensemble d'agents utilisant des moyens de télécommunication et d'informatique pour assurer les contacts d'une entreprise avec sa clientèle."}, {"en": "data center", "fr": "centre de données", "year": "2019", "tier": 1, "d": "Site physique où sont regroupées des infrastructures informatiques et de télécommunication destinées à stocker, à traiter ou à distribuer des…"}, {"en": "hoax", "fr": "canular", "year": "2005", "tier": 1, "d": "Information fausse transmise par messagerie électronique et incitant les destinataires abusés à effectuer des opérations ou à prendre des…"}, {"en": "hat trick", "fr": "coup du chapeau", "year": "2011", "tier": 1, "d": "Prouesse qui, dans certains sports collectifs, consiste pour un joueur à marquer trois buts au cours d'une même partie."}, {"en": "prime time", "fr": "heure de grande écoute", "year": "2005", "tier": 1, "d": "Tranche horaire où l'audience est la plus forte."}, {"en": "flashback", "fr": "retour en arrière", "year": "2005", "tier": 1, "d": "Rupture de la continuité chronologique d'une action par l'évocation d'une période antérieure."}, {"en": "marketing", "fr": "mercatique", "year": "2018", "tier": 1, "d": "Ensemble des techniques et des actions grâce auxquelles une entreprise développe méthodiquement la vente de ses produits et de ses services en…"}, {"en": "database", "fr": "base de données", "year": "2000", "tier": 1, "d": ""}, {"en": "home office", "fr": "bureau à domicile", "year": "2006", "tier": 1, "d": ""}, {"en": "machine learning", "fr": "apprentissage automatique", "year": "2018", "tier": 1, "d": "Processus par lequel un algorithme évalue et améliore ses performances sans l’intervention d’un programmeur, en répétant son exécution sur des…"}, {"en": "web", "fr": "toile", "year": "2018", "tier": 1, "d": "Système de publication, de gestion et de consultation de documents et d’autres ressources, qui est réparti géographiquement et structurellement…"}, {"en": "podcast", "fr": "audio", "year": "2020", "tier": 1, "d": "Contenu audio mis à la disposition du public dans l’internet."}, {"en": "smartphone", "fr": "mobile multifonction", "year": "2018", "tier": 1, "d": "Terminal mobile qui assure la téléphonie et l’accès à l’internet par voie radioélectrique, ainsi que d’autres fonctions informatiques ou multimédias."}, {"en": "deepfake", "fr": "infox vidéo", "year": "2020", "tier": 1, "d": "Infox qui se présente sous la forme d’une vidéo falsifiée grâce aux techniques de l’intelligence artificielle, en particulier à celles de…"}, {"en": "open space", "fr": "plateau", "year": "2006", "tier": 1, "d": "Vaste local pourvu d'équipements de base et libre d'aménagements."}, {"en": "low cost", "fr": "à coûts réduits", "year": "2018", "tier": 1, "d": "Se dit d’une stratégie de réduction des coûts, caractérisée par une offre concentrée sur les seules fonctions essentielles, pour le client, d’un…"}, {"en": "replay tv", "fr": "télévision de rattrapage", "year": "2023", "tier": 1, "d": "Service de rattrapage qui permet de voir ou de revoir un programme télévisé."}, {"en": "mouse", "fr": "souris", "year": "2000", "tier": 1, "d": "Dispositif de commande tenu à la main, connecté à un ordinateur, et dont le déplacement sur une surface entraîne le déplacement d'un repère sur…"}, {"en": "joystick", "fr": "manche à balai", "year": "2000", "tier": 1, "d": "Dispositif de commande à plusieurs degrés de liberté servant à déplacer le curseur d'un écran de visualisation."}, {"en": "frisbee", "fr": "disque-volant", "year": "2008", "tier": 1, "d": "Engin de jeu, de forme ronde et plate, conçu pour planer en tournant sur lui-même, auquel on donne plus ou moins d'effet lors du lancer."}, {"en": "leasing", "fr": "crédit-bail", "year": "2000", "tier": 1, "d": "Technique de crédit dans laquelle le prêteur offre à l'emprunteur la location d'un bien, assortie d'une promesse unilatérale de vente, qui peut se…"}, {"en": "e-learning", "fr": "cyberformation", "year": "2023", "tier": 1, "d": "Formation qui fait appel à des ressources et à des dispositifs pédagogiques accessibles dans un espace numérique, et qui peut notamment s’appuyer…"}, {"en": "online", "fr": "en ligne", "year": "2000", "tier": 1, "d": "Se dit d'un matériel lorsqu'il fonctionne en relation directe avec un autre."}, {"en": "playback", "fr": "présonorisation", "year": "2005", "tier": 1, "d": "Technique cinématographique ou de télévision qui consiste à enregistrer le son avant l'image afin que le ou les interprètes puissent mimer les…"}, {"en": "hit parade", "fr": "palmarès", "year": "2000", "tier": 1, "d": ""}, {"en": "post-it note", "fr": "papillon", "year": "2005", "tier": 1, "d": "Petit papier détachable à bande semi-adhésive."}, {"en": "flash mob", "fr": "mobilisation éclair", "year": "2010", "tier": 1, "d": "Rassemblement impromptu de personnes averties par minimessage ou par l'internet."}, {"en": "scoop", "fr": "exclusivité", "year": "2000", "tier": 1, "d": "Information importante ou à sensation donnée en exclusivité."}, {"en": "business angel", "fr": "investisseur providentiel", "year": "2007", "tier": 2, "d": "Investisseur privé qui apporte capital et savoir-faire à de jeunes entreprises innovantes sans rechercher de rendement immédiat, dans une…"}, {"en": "team building", "fr": "renforcement d'équipe", "year": "1998", "tier": 2, "d": ""}, {"en": "core business", "fr": "cœur de métier", "year": "2004", "tier": 2, "d": "Activité première d'une entreprise."}, {"en": "cash cow", "fr": "vache à lait", "year": "2010", "tier": 2, "d": "Produit, activité ou entreprise dégageant des profits élevés, le plus souvent grâce à une rente de situation."}, {"en": "game changer", "fr": "tournant décisif", "year": "2022", "tier": 2, "d": "Évènement ou élément nouveau qui marque un changement radical de situation."}, {"en": "short list", "fr": "liste restreinte", "year": "2004", "tier": 2, "d": "Liste des candidats retenus après une présélection."}, {"en": "check list", "fr": "liste de vérification", "year": "2000", "tier": 2, "d": "Document écrit servant d'aide-mémoire, indiquant dans l'ordre les différentes opérations ou vérifications à effectuer avant, pendant ou après la…"}, {"en": "success story", "fr": "histoire d'une réussite", "year": "2004", "tier": 2, "d": ""}, {"en": "soft skill", "fr": "savoir-être professionnel", "year": "2016", "tier": 2, "d": "Capacité d'un individu à adopter un comportement adapté à son milieu professionnel."}, {"en": "lean management", "fr": "gestion au plus juste", "year": "2014", "tier": 2, "d": "Méthode de management qui consiste à assurer la conduite d’une entreprise au coût le plus faible possible."}, {"en": "digital native", "fr": "enfant du numérique", "year": "2015", "tier": 2, "d": "Personne qui, ayant toujours vécu dans un environnement numérique, est présumée familière des outils et des usages des nouvelles techniques…"}, {"en": "big tech", "fr": "géant du numérique", "year": "2026", "tier": 2, "d": "Entreprise dont le modèle économique repose sur l’offre au public d’un service informatique et sur la collecte et l’exploitation des données des…"}, {"en": "dark net", "fr": "internet clandestin", "year": "2017", "tier": 2, "d": "Ensemble de réseaux conçus pour assurer l’anonymat des utilisateurs par la mise en œuvre d’une architecture décentralisée ainsi que de logiciels…"}, {"en": "zero-day", "fr": "faille non corrigée", "year": "2021", "tier": 2, "d": "Faille identifiée par des utilisateurs d’un système informatique, à laquelle il n’existe pas encore de parade."}, {"en": "bug bounty", "fr": "prime à la faille détectée", "year": "2020", "tier": 2, "d": "Rémunération octroyée par une organisation à un expert informatique indépendant qui découvre une faille de sécurité au sein d’un système…"}, {"en": "killer app", "fr": "application phare", "year": "2022", "tier": 2, "d": "Application informatique innovante dont la popularité est immédiate auprès des utilisateurs."}, {"en": "plug-and-play", "fr": "prêt à l'emploi", "year": "2007", "tier": 2, "d": "Se dit d'un équipement électronique utilisable dès sa connexion."}, {"en": "plugin", "fr": "module complémentaire", "year": "2026", "tier": 2, "d": "Composant logiciel qui ne peut être utilisé de manière autonome mais qui, une fois installé, apporte de nouvelles fonctionnalités à une ou…"}, {"en": "upgrade", "fr": "mise à niveau", "year": "2000", "tier": 2, "d": "Actualisation d'un logiciel ou d'un matériel."}, {"en": "browser", "fr": "logiciel de navigation", "year": "1999", "tier": 2, "d": "Dans un environnement de type internet, logiciel qui permet à l'utilisateur de rechercher et de consulter des documents et d'exploiter les liens…"}, {"en": "pop-up window", "fr": "fenêtre intruse", "year": "2005", "tier": 2, "d": "Fenêtre qui s'affiche soudainement à l'écran sans que l'utilisateur en ait fait la demande."}, {"en": "peer-to-peer", "fr": "pair à pair", "year": "2017", "tier": 2, "d": "Se dit du mode d’utilisation d’un réseau dans lequel chacun des participants connectés dispose des mêmes droits et qui permet un échange direct de…"}, {"en": "data mining", "fr": "exploration de données", "year": "2003", "tier": 2, "d": "Processus de recherche dans un ensemble de données destiné à détecter des corrélations cachées ou des informations nouvelles."}, {"en": "cloud gaming", "fr": "jeu vidéo en nuage", "year": "2022", "tier": 2, "d": "Technologie qui, grâce à l’informatique en nuage, permet de jouer à un jeu vidéo à distance sans téléchargement."}, {"en": "free-to-play", "fr": "jeu vidéo en accès gratuit", "year": "2022", "tier": 2, "d": "Jeu vidéo dont la version de base est gratuite mais qui peut comporter des fonctionnalités payantes."}, {"en": "gameplay", "fr": "jouabilité", "year": "2010", "tier": 2, "d": "Ensemble des possibilités d'action offertes au joueur par un jeu vidéo ;"}, {"en": "serious game", "fr": "jeu sérieux", "year": "2019", "tier": 2, "d": "Jeu vidéo conçu à des fins d’éducation, de formation, de communication ou d’information."}, {"en": "story-board", "fr": "scénarimage", "year": "2006", "tier": 2, "d": "Recueil de croquis correspondant au découpage du scénario d'un film, et présentant le contenu et le cadrage des différents plans de chacune des…"}, {"en": "blockbuster", "fr": "grosse machine", "year": "2006", "tier": 2, "d": "Production à gros budget, dont l'ambition semble surtout commerciale."}, {"en": "one-man show", "fr": "spectacle solo", "year": "2000", "tier": 2, "d": "Spectacle de variétés assuré par un artiste seul en scène."}, {"en": "breaking news", "fr": "information de dernière minute", "year": "2010", "tier": 2, "d": "Information dont l'importance justifie la diffusion ou la publication en urgence."}, {"en": "talking points", "fr": "éléments de langage", "year": "2025", "tier": 2, "d": "Formules ou ensemble d’arguments proposés à une personne sur les sujets qui pourront être abordés lors d’un entretien ou d’une communication…"}, {"en": "buzz marketing", "fr": "bouche à oreille", "year": "2007", "tier": 2, "d": "Technique mercatique fondée sur l'exploitation des messages circulant entre les consommateurs."}, {"en": "it-girl", "fr": "icône de la mode", "year": "2023", "tier": 2, "d": "Personne, le plus souvent jeune, dont l’allure et le style vestimentaire font référence."}, {"en": "top model", "fr": "mannequin vedette", "year": "2005", "tier": 2, "d": ""}, {"en": "must have", "fr": "incontournable", "year": "2023", "tier": 2, "d": "Vêtement ou accessoire que l’on se doit de posséder pour être à la mode."}, {"en": "mood board", "fr": "planche de tendances", "year": "2019", "tier": 2, "d": "Assemblage d’éléments tels que des images, des objets, des échantillons, des mots, qui sert de support d’inspiration pour concevoir un univers…"}, {"en": "skate park", "fr": "planchodrome", "year": "2023", "tier": 2, "d": "Site aménagé pour la pratique de la planche à roulettes ;"}, {"en": "trail running", "fr": "course de pleine nature", "year": "2010", "tier": 2, "d": "Course d'endurance en terrain naturel et varié, dans laquelle les concurrents enchaînent des difficultés pouvant imposer une alternance de marche…"}, {"en": "base jump", "fr": "saut extrême", "year": "2010", "tier": 2, "d": "Pratique extrême de parachutisme consistant à s'élancer en chute libre, du haut d'une paroi, d'un édifice ou d'un ouvrage d'art."}, {"en": "wing suit", "fr": "combinaison ailée", "year": "2010", "tier": 2, "d": "Combinaison à voiles souples intégrées qui permet à un parachutiste de planer avant d'ouvrir son parachute ;"}, {"en": "dunk", "fr": "panier smashé", "year": "2011", "tier": 2, "d": "Tir réussi par un joueur qui saute et rabat le ballon à l'intérieur du panier d'une forte claque."}, {"en": "pace maker", "fr": "lièvre", "year": "2010", "tier": 2, "d": "Athlète qui prend momentanément la tête d'une course en peloton et lui imprime un train soutenu, de manière à favoriser un ou plusieurs concurrents."}, {"en": "starting block", "fr": "bloc de départ", "year": "2000", "tier": 2, "d": "Instrument fixé au sol sur lequel le coureur cale ses pieds au départ, et destiné à lui assurer une meilleure propulsion lors de l'élan initial."}, {"en": "drop shipping", "fr": "vente en ligne sans stock", "year": "2023", "tier": 2, "d": "Pratique commerciale qui consiste, pour un distributeur en ligne, à déléguer entièrement à des tiers la logistique, notamment le stockage et la…"}, {"en": "dark store", "fr": "entrepôt relais", "year": "2023", "tier": 2, "d": "Entrepôt secondaire d’une entreprise de vente en ligne, qui est implanté près des clients potentiels et dont les rayons sont disposés comme ceux…"}, {"en": "cash back", "fr": "remise différée", "year": "2011", "tier": 2, "d": "Remise proposée à un client sur un achat ultérieur."}, {"en": "self check-out", "fr": "caisse en libre service", "year": "2014", "tier": 2, "d": "Caisse qui permet à un client d’enregistrer ses achats et d’en effectuer le paiement lui-même."}, {"en": "duty-free shop", "fr": "boutique hors taxes", "year": "2000", "tier": 2, "d": "Boutique où sont proposées à la vente des marchandises qui ne sont pas soumises au paiement de taxes."}, {"en": "road show", "fr": "tournée de présentation", "year": "2008", "tier": 2, "d": "Tournée promotionnelle organisée de place en place par une entreprise qui souhaite présenter ses projets aux investisseurs et à la presse."}, {"en": "kick-off meeting", "fr": "réunion de démarrage", "year": "2009", "tier": 2, "d": "Réunion de travail rassemblant les parties concernées et marquant le lancement effectif d'une activité."}, {"en": "mind map", "fr": "carte heuristique", "year": "2021", "tier": 2, "d": "Représentation graphique d’informations, de connaissances et d’idées, qui sont organisées en arborescences autour d’un thème central afin de…"}, {"en": "flash card", "fr": "carte-éclair", "year": "2014", "tier": 2, "d": "Support pédagogique imprimé ou numérique, se présentant sous forme de fiche, qui permet l’acquisition de connaissances et de compétences et sa…"}, {"en": "smart money", "fr": "argent futé", "year": "2004", "tier": 2, "d": "Réserve d'argent pour investissement propice."}, {"en": "seed money", "fr": "fonds d'amorçage", "year": "2011", "tier": 2, "d": "Fonds alloués, le plus souvent par des investisseurs providentiels, au lancement d'un projet pour permettre la prospection de marchés et le…"}, {"en": "scale up", "fr": "gazelle", "year": "2022", "tier": 2, "d": "Jeune pousse dont la croissance soutenue pendant plusieurs exercices atteste l’extensibilité du modèle économique."}, {"en": "junk bond", "fr": "obligation à haut risque", "year": "2000", "tier": 2, "d": "Obligation émise par une entreprise privée n'ayant pas demandé de notation ou n'ayant obtenu qu'une mauvaise notation de son émission."}, {"en": "green bond", "fr": "obligation verte", "year": "2023", "tier": 2, "d": "Obligation émise par une entité publique ou privée pour financer un projet qui a un effet positif sur l’environnement."}, {"en": "flash crash", "fr": "krach éclair", "year": "2018", "tier": 2, "d": "Chute forte et extrêmement rapide des cours boursiers."}, {"en": "day trader", "fr": "opérateur à la journée", "year": "2008", "tier": 2, "d": "Opérateur qui prend et dénoue ses positions dans la même journée."}, {"en": "offshore", "fr": "extraterritorial", "year": "2000", "tier": 2, "d": "Qualifie les activités bancaires et financières domiciliées dans les places étrangères."}, {"en": "clean tech", "fr": "écotechnologie", "year": "2010", "tier": 2, "d": "Ensemble des procédés industriels qui visent à prévenir ou réduire les effets négatifs sur l'environnement des produits à chaque stade de leur…"}, {"en": "wind farm", "fr": "parc éolien", "year": "2023", "tier": 2, "d": "Site terrestre ou marin regroupant plusieurs éoliennes qui transforment l’énergie cinétique du vent en énergie électrique."}, {"en": "hot spot", "fr": "zone d'accès sans fil", "year": "2005", "tier": 2, "d": "Espace où le public bénéficie de services radioélectriques temporaires ou permanents à haut débit, notamment d'un accès sans fil à l'internet."}, {"en": "at-sign", "fr": "arrobe", "year": "2002", "tier": 2, "d": "Caractère @ fréquemment employé dans les adresses de courrier électronique pour séparer le nom identifiant l'utilisateur de celui du gestionnaire…"}, {"en": "e-book reader", "fr": "liseuse", "year": "2012", "tier": 2, "d": "Appareil portable doté d'un écran et destiné au stockage et à la lecture des livres numériques ou des périodiques."}, {"en": "flip book", "fr": "folioscope", "year": "2019", "tier": 2, "d": "Petit livre qui, lorsqu’il est feuilleté rapidement à un rythme régulier, permet de voir une succession d’images créant l’illusion d’une séquence…"}, {"en": "lip dub", "fr": "mimoclip", "year": "2011", "tier": 2, "d": "Interprétation mimée, sur un vidéogramme, d'une bande-son préexistante ;"}, {"en": "mash-up", "fr": "collage", "year": "2010", "tier": 2, "d": "Assemblage, au moyen d'outils numériques, d'éléments visuels ou sonores provenant de différentes sources."}, {"en": "fan edit", "fr": "montage sauvage", "year": "2007", "tier": 2, "d": "Version d'une œuvre audiovisuelle ou musicale tronquée ou modifiée par des admirateurs, à l'insu de ses auteurs."}, {"en": "trash television", "fr": "télé-poubelle", "year": "2010", "tier": 2, "d": "Programme télévisé vulgaire, racoleur et dégradant."}, {"en": "bore-out", "fr": "ennui professionnel", "year": "2023", "tier": 2, "d": "Perte d’intérêt professionnel qui est provoquée chez une personne par une quantité de travail insuffisante ou par l’accomplissement de tâches…"}, {"en": "brown-out", "fr": "perte de sens professionnelle", "year": "2023", "tier": 2, "d": "Perte d’intérêt professionnel qui est provoquée chez une personne par l’incompréhension de la finalité de son travail, voire par le sentiment de…"}, {"en": "solo wheel", "fr": "gyroroue", "year": "2021", "tier": 2, "d": "Engin léger de déplacement personnel à moteur électrique, qui est constitué d’une roue autostabilisée par effet gyroscopique et placée entre deux…"}, {"en": "bmx", "fr": "bicross", "year": "2025", "tier": 2, "d": "Vélo équipé de petites roues et dépourvu de dérailleur, qui est conçu pour la vitesse et l’acrobatie ;"}, {"en": "walking bus", "fr": "pédibus", "year": "2020", "tier": 2, "d": "Mode de déplacement collectif à pied d’enfants qui sont conduits par des adultes sur un trajet et selon un horaire de passage déterminés."}, {"en": "steward", "fr": "stadiaire", "year": "1997", "tier": 2, "d": "Agent exerçant auprès du public d'un stade les fonctions d'accueil, d'assistance, de contrôle et de sécurité."}, {"en": "clean sheet", "fr": "cage inviolée", "year": "2020", "tier": 2, "d": "Fait, pour une équipe ou un gardien, qu’aucun but n’ait été marqué contre eux au cours d’un match ou d’une série de matchs."}, {"en": "deep state", "fr": "État profond", "year": "2022", "tier": 2, "d": "Ensemble de personnes, généralement soutenues par des groupes d’intérêt, dont on suppose que les rôles clés au sein de l’État leur permettent…"}, {"en": "swing state", "fr": "État-charnière", "year": "2012", "tier": 2, "d": "État des États-Unis qui peut alterner, d'un scrutin à l'autre, entre les deux partis dominants et faire basculer le résultat du vote final."}, {"en": "black bloc", "fr": "cagoules noires", "year": "2020", "tier": 2, "d": "Groupe d’individus cagoulés et vêtus de noir qui recourt, à la faveur de manifestations sur la voie publique, à des actions violentes concertées,…"}, {"en": "cosplay", "fr": "costumade", "year": "2011", "tier": 2, "d": "Rassemblement costumé d'amateurs ayant endossé l'apparence de leurs personnages favoris, empruntés à la bande dessinée, au manga, au cinéma et aux…"}, {"en": "edge computing", "fr": "informatique en périphérie", "year": "2021", "tier": 2, "d": "Traitement des données qui s’effectue en périphérie d’un réseau de télécommunication, au moyen d’un dispositif proche de la source de ces données…"}, {"en": "data lake", "fr": "lac de données", "year": "2023", "tier": 2, "d": "Infrastructure logicielle qui collecte des mégadonnées dans leur format d’origine, généralement en continu, et les associe automatiquement à des…"}, {"en": "cost killer", "fr": "chasseur de coûts", "year": "2004", "tier": 2, "d": "Personne chargée de traquer toutes les dépenses superflues."}, {"en": "golden hello", "fr": "pont d'or", "year": "2010", "tier": 2, "d": "Avantage exceptionnel proposé à une personne pour l'inciter à rejoindre une entreprise."}, {"en": "firmware", "fr": "microprogramme", "year": "2000", "tier": 3, "d": ""}, {"en": "random-access memory", "fr": "mémoire vive", "year": "2000", "tier": 3, "d": "Mémoire dont le contenu peut être modifié en usage normal."}, {"en": "read-only memory", "fr": "mémoire morte", "year": "2000", "tier": 3, "d": "Mémoire dont le contenu ne peut être modifié en usage normal."}, {"en": "cache memory", "fr": "antémémoire", "year": "2007", "tier": 3, "d": "Mémoire très rapide, intercalée entre le processeur et la mémoire principale, que l'ordinateur consulte avant d'interroger la mémoire principale…"}, {"en": "page turner", "fr": "accrolivre", "year": "2019", "tier": 3, "d": "Livre à ce point captivant qu’on le lit d’une traite."}, {"en": "chick lit", "fr": "romance urbaine", "year": "2020", "tier": 3, "d": "Catégorie de roman qui met en scène avec humour et dérision une jeune citadine d’aujourd’hui."}, {"en": "cosy crime", "fr": "roman policier léger", "year": "2023", "tier": 3, "d": "Catégorie de roman policier dont l’intrigue, traitée avec humour et légèreté, procure une lecture divertissante."}, {"en": "book trailer", "fr": "bande-annonce de livre", "year": "2019", "tier": 3, "d": "Document audiovisuel conçu pour promouvoir un livre."}, {"en": "extended play", "fr": "minialbum", "year": "2020", "tier": 3, "d": "Album musical qui présente au maximum six titres et moins de trente minutes de musique enregistrée."}, {"en": "video jockey", "fr": "imagiste", "year": "2006", "tier": 3, "d": "Personne qui combine des éléments visuels provenant de différentes sources, en particulier d'œuvres cinématographiques et de vidéogrammes, en vue…"}, {"en": "bus shelter", "fr": "aubette", "year": "2000", "tier": 3, "d": "Abri aménagé aux points de départ ou d'arrêt d'un moyen de transport en commun."}, {"en": "skipper", "fr": "chef de bord", "year": "2007", "tier": 3, "d": "Personne responsable du pilotage d'un navire."}, {"en": "fiscal cliff", "fr": "couperet budgétaire", "year": "2015", "tier": 3, "d": "Arrivée à échéance de dispositifs fiscaux ou budgétaires qui entraîne l'application automatique de mesures de restriction."}, {"en": "sharp power", "fr": "pouvoir de manipulation", "year": "2022", "tier": 3, "d": "Capacité d’un État à manipuler les opinions publiques d’autres États, notamment par l’usage d’infox."}, {"en": "civic tech", "fr": "technologie civique", "year": "2019", "tier": 3, "d": "Ensemble d’outils numériques conçus pour renforcer la compréhension des institutions par les citoyens et leur participation à la vie démocratique."}, {"en": "open banking", "fr": "banque ouverte", "year": "2026", "tier": 3, "d": "Disposition qui permet au client d’une banque d’autoriser des prestataires de services financiers à accéder à ses données bancaires par…"}, {"en": "copy trading", "fr": "négoce mimétique", "year": "2026", "tier": 3, "d": "Stratégie de négoce qui consiste à calquer, notamment grâce à des plateformes spécialisées, ses ordres d’achat et de vente sur ceux d’une personne…"}, {"en": "social trading", "fr": "négoce communautaire", "year": "2026", "tier": 3, "d": "Négoce recourant à une application qui permet aux utilisateurs d’échanger leurs avis."}, {"en": "crypto asset", "fr": "cyberjeton", "year": "2021", "tier": 3, "d": "Actif numérique émis et attribué ou transféré au moyen d’un dispositif d’enregistrement électronique partagé à un participant à ce dispositif."}, {"en": "proof of work", "fr": "preuve de travail", "year": "2017", "tier": 3, "d": "Résultat d’une tâche fortement consommatrice de ressources de calcul, dont l’exactitude est facilement vérifiable par tout participant et atteste…"}, {"en": "love money", "fr": "argent du cœur", "year": "2004", "tier": 3, "d": "Soutien financier apporté pour des raisons affectives ou familiales."}, {"en": "family office", "fr": "gestionnaire de grande fortune", "year": "2012", "tier": 3, "d": "Organisme spécialisé dans la gestion administrative et financière de patrimoines importants."}, {"en": "bad bank", "fr": "structure de défaisance", "year": "2022", "tier": 3, "d": "Entité ad hoc créée pour recueillir et gérer des actifs de mauvaise qualité cédés par une institution qui cherche ainsi à améliorer son bilan."}, {"en": "private equity", "fr": "investissement en capital", "year": "2013", "tier": 3, "d": "Activité consistant à investir dans des entreprises non cotées en Bourse."}, {"en": "trust", "fr": "fiducie", "year": "2000", "tier": 3, "d": "Contrat par lequel un constituant transfère temporairement la propriété de biens ou de droits à un fiduciaire, à charge pour ce dernier d'agir…"}, {"en": "broker", "fr": "courtier", "year": "2001", "tier": 3, "d": "Intermédiaire qui agit sur les marchés financiers pour le compte de tiers."}, {"en": "pocket bike", "fr": "minimoto", "year": "2009", "tier": 3, "d": "Moto de taille réduite, utilisée à des fins ludiques ou sportives."}, {"en": "gravel bike", "fr": "vélo de gravier", "year": "2025", "tier": 3, "d": "Vélo qui combine le cadre du vélo de route avec des pneus larges et crantés ;"}, {"en": "rss feed", "fr": "flux de dépêches", "year": "2013", "tier": 3, "d": "Suite de données générées automatiquement par un site de la toile pour permettre l'accès aux nouveautés de ce site."}, {"en": "eye tracking", "fr": "oculométrie", "year": "2016", "tier": 3, "d": "Ensemble des techniques d’enregistrement et d’analyse des mouvements oculaires."}, {"en": "text-to-speech", "fr": "synthèse vocale de texte", "year": "2019", "tier": 3, "d": "Conversion automatique d’un texte en un énoncé oral, qui recourt notamment aux techniques de traitement automatique des langues naturelles et de…"}, {"en": "splash screen", "fr": "fenêtre d'attente", "year": "2005", "tier": 3, "d": "Fenêtre qui s'affiche provisoirement sur un écran pendant l'installation d'un logiciel."}, {"en": "hidden web", "fr": "toile profonde", "year": "2017", "tier": 3, "d": "Partie de la toile qui n’est pas accessible aux internautes au moyen des moteurs de recherche usuels."}, {"en": "office automation", "fr": "bureautique", "year": "2000", "tier": 3, "d": "Ensemble des techniques et des moyens tendant à automatiser les activités de bureau et principalement le traitement et la communication de la…"}, {"en": "bundle", "fr": "offre groupée", "year": "2009", "tier": 3, "d": ""}, {"en": "knowledge management", "fr": "gestion du savoir", "year": "2001", "tier": 3, "d": "Gestion du capital intellectuel de l'entreprise, actif immatériel constitué par l'ensemble des connaissances et du savoir-faire des salariés."}, {"en": "green tax", "fr": "écotaxe", "year": "2011", "tier": 3, "d": "Prélèvement fiscal opéré sur un bien, un service ou une activité en raison des dommages qu'ils sont susceptibles d'occasionner à l'environnement."}, {"en": "dos attack", "fr": "attaque par interruption de service", "year": "2022", "tier": 3, "d": "Action malveillante qui vise à rendre indisponibles pendant un temps indéterminé un ou plusieurs services informatiques ou de télécommunication…"}, {"en": "tracker", "fr": "fonds indiciel coté", "year": "2018", "tier": 3, "d": "Fonds coté sur un marché, dont l’objet est de reproduire l’évolution de la valeur d’un panier d’actifs, que celui-ci soit composé de matières…"}, {"en": "penny stock", "fr": "valeur à quatre sous", "year": "2012", "tier": 3, "d": "Action hautement spéculative et dont le cours est très bas."}, {"en": "golden share", "fr": "action en or", "year": "2011", "tier": 3, "d": "Action réservée à certains investisseurs, en particulier l'État, et assortie d'un droit de veto."}, {"en": "chinese wall", "fr": "cloison étanche", "year": "2014", "tier": 3, "d": "Séparation rigoureuse des différentes fonctions exercées dans un établissement financier, telles que la gestion de portefeuilles, l’analyse…"}, {"en": "fact book", "fr": "descriptif", "year": "2013", "tier": 3, "d": "Fiche d'information portant sur un sujet donné."}, {"en": "hand-out", "fr": "document d’accompagnement", "year": "2021", "tier": 3, "d": "Document imprimé qui est mis à la disposition d’un auditoire et qui accompagne un exposé, un cours ou une présentation."}, {"en": "trade show", "fr": "salon professionnel", "year": "2000", "tier": 3, "d": ""}, {"en": "soft landing", "fr": "atterrissage en douceur", "year": "2001", "tier": 3, "d": "Récession maîtrisée et progressive."}, {"en": "lay-off", "fr": "chômage temporaire", "year": "1998", "tier": 3, "d": "Situation créée par un licenciement, en général collectif, effectué par une entreprise en difficulté conjoncturelle, avec promesse de réembauche…"}, {"en": "policy mix", "fr": "dosage macroéconomique", "year": "2000", "tier": 3, "d": "Arbitrage effectué par les pouvoirs publics entre les instruments budgétaire et monétaire, en vue d'assurer le meilleur équilibre entre croissance…"}, {"en": "exit tax", "fr": "taxe d'expatriation", "year": "2012", "tier": 3, "d": "Impôt compensatoire auquel peuvent être soumises les plus-values latentes constatées sur le patrimoine mobilier d'un contribuable qui transfère…"}, {"en": "patent box", "fr": "régime privilégié des brevets", "year": "2017", "tier": 3, "d": "Régime fiscal particulièrement favorable aux produits de la cession ou de la concession de brevets et d’autres droits de propriété intellectuelle."}, {"en": "ghost kitchen", "fr": "traiteur tout en ligne", "year": "2024", "tier": 3, "d": "Entreprise de restauration qui prépare des plats exclusivement destinés à la livraison de commandes passées en ligne ou par téléphone."}, {"en": "me-too", "fr": "suiveur", "year": "2000", "tier": 3, "d": "Personne ou entreprise qui imite un produit, une technique, un service considérés comme dominants sur le marché."}, {"en": "early bird", "fr": "prime à la réponse", "year": "2004", "tier": 3, "d": "Technique de promotion des ventes consistant à offrir un avantage au consommateur s'il achète dans un court délai."}, {"en": "give-away", "fr": "cadeau publicitaire", "year": "2000", "tier": 3, "d": "Objet de faible valeur distribué gratuitement pour promouvoir un produit ou une entreprise."}, {"en": "long tail", "fr": "longue traîne", "year": "2010", "tier": 3, "d": "Modèle économique dans lequel la vente, même en faible quantité, de produits culturels ou d'œuvres destinés à un public réduit ou dispersé devient…"}, {"en": "time-to-market", "fr": "délai de lancement", "year": "2006", "tier": 3, "d": "Temps écoulé entre la décision de s'implanter sur un marché et la mise en vente effective d'un produit."}, {"en": "close-up", "fr": "gros plan", "year": "2000", "tier": 3, "d": "Plan isolant un détail du corps ;"}, {"en": "voice-over", "fr": "voix hors champ", "year": "2000", "tier": 3, "d": "Voix d'une personne absente à l'écran."}, {"en": "casting", "fr": "audition", "year": "2005", "tier": 3, "d": "Mode de sélection des artistes susceptibles de tenir les rôles d'un film, d'une pièce de théâtre ou d'un programme."}], "bosses": [{"en": "cloud computing", "fr": "informatique en nuage", "year": "2010", "decoys": ["informatique nuageuse", "nuage informatique"], "d": "Mode de traitement des données d'un client, dont l'exploitation s'effectue par l'internet, sous la forme de services fournis par un prestataire."}, {"en": "crowdfunding", "fr": "financement participatif", "year": "2013", "decoys": ["financement collaboratif", "financement par la foule"], "d": "Financement faisant appel à un grand nombre de personnes, généralement des internautes, pour qu'elles investissent les fonds nécessaires à…"}, {"en": "brainstorming", "fr": "remue-méninges", "year": "2000", "decoys": ["tempête de cerveaux", "remue-cervelles"], "d": "Technique de groupe destinée à stimuler l'imagination des participants en vue de leur faire produire le maximum d'idées dans le minimum de temps."}, {"en": "deep learning", "fr": "apprentissage profond", "year": "2018", "decoys": ["apprentissage approfondi", "savoir profond"], "d": "Apprentissage automatique qui utilise un réseau de neurones artificiels composé d’un grand nombre de couches dont chacune correspond à un niveau…"}, {"en": "software as a service", "fr": "logiciel à la demande", "year": "2013", "decoys": ["logiciel en service", "service logiciel en ligne"], "d": "Prestation de service proposant à un client l'utilisation à distance d'un logiciel et dont le coût correspond à son usage effectif."}, {"en": "social engineering", "fr": "manipulation psychosociale", "year": "2021", "decoys": ["ingénierie sociale", "manipulation sociale"], "d": "Ensemble de techniques frauduleuses qui permettent, en exploitant la confiance ou la crédulité d’une personne, choisie en fonction de…"}, {"en": "burnout", "fr": "syndrome d'épuisement professionnel", "year": "2012", "decoys": ["syndrome de l'épuisement au travail", "épuisement professionnel aigu"], "d": "Syndrome caractérisé par un état de fatigue extrême, tant physique que mentale, attribué à la profession exercée et aux conditions de son exercice."}, {"en": "binge watching", "fr": "visionnage boulimique", "year": "2017", "decoys": ["visionnage compulsif", "gavage télévisuel"], "d": "Pratique qui consiste à regarder à la suite un très grand nombre de contenus audiovisuels, notamment les épisodes d’une même série télévisée."}, {"en": "first person shooter", "fr": "jeu de tir en vue subjective", "year": "2017", "decoys": ["jeu de tir à la première personne", "jeu de tir en vue intérieure"], "d": "Jeu de tir dans lequel le joueur voit ce que le personnage qu’il contrôle est censé voir."}, {"en": "speech-to-text", "fr": "transcription automatique de la parole", "year": "2019", "decoys": ["transcription vocale automatique", "conversion parole-texte"], "d": "Conversion automatique d’un énoncé oral en texte, qui recourt notamment aux techniques de traitement du signal et de traitement automatique des…"}, {"en": "business intelligence", "fr": "veille économique", "year": "1998", "decoys": ["intelligence d'affaires", "renseignement d'entreprise"], "d": "Recherche, traitement et diffusion (en vue de leur exploitation) de renseignements utiles à l'entreprise."}, {"en": "game as a service", "fr": "jeu vidéo à la demande", "year": "2022", "decoys": ["jeu vidéo en service", "jeu en abonnement"], "d": "Offre commerciale qui propose l’utilisation d’un jeu vidéo en nuage, facturée pour un usage ponctuel ou, plus souvent, liée à un abonnement."}, {"en": "not in my back yard", "fr": "non au projet ici", "year": "2023", "decoys": ["pas dans mon jardin", "pas chez moi, merci"], "d": ""}, {"en": "intelligent speed adaptation", "fr": "installation de surveillance d'allure", "year": "2004", "decoys": ["adaptation intelligente de vitesse", "régulateur d'allure intelligent"], "d": "Système faisant appel à un équipement externe qui, en cas de dépassement d'une vitesse limite, adresse un signal au conducteur ou commande…"}, {"en": "fat bike", "fr": "vélo à pneus surdimensionnés", "year": "2020", "decoys": ["vélo à gros pneus", "vélo à pneus larges"], "d": "Vélo tout-terrain muni de pneus très larges équipés de crampons, qui améliorent l’adhérence sur des terrains meubles ou glissants ;"}, {"en": "auto-tune", "fr": "ajustement automatique d'intonation", "year": "2020", "decoys": ["correcteur de justesse automatique", "accordage vocal automatique"], "d": "Procédé sonore numérique qui permet, lors d’une séance d’enregistrement ou d’un concert, d’aligner la fréquence d’une voix sur une hauteur…"}, {"en": "open source software", "fr": "logiciel libre", "year": "2007", "decoys": ["logiciel ouvert", "logiciel à source ouverte"], "d": "Logiciel distribué avec l'intégralité de ses programmes-sources, afin que l'ensemble des utilisateurs qui l'emploient, puissent l'enrichir et le…"}, {"en": "e-sport", "fr": "jeu vidéo de compétition", "year": "2022", "decoys": ["sport électronique", "compétition vidéoludique"], "d": "Pratique compétitive, généralement professionnelle, du jeu vidéo qui est organisée dans le cadre de ligues nationales ou de championnats…"}]};
+const JOKES = {
+  "hashtag":"Le # se dit « dièse », comme en musique. Voilà.",
+  "start-up":"A young sprout. Water regularly with venture capital.",
+  "podcast":"Yes, really: officially it's just « audio ».",
+  "smartphone":"Mobile multifonction. Try saying that while doomscrolling.",
+  "open space":"Your open space is officially a « plateau ». Like a TV set, with fewer snacks.",
+  "deepfake":"An infox, but in video. Logique.",
+  "frisbee":"Disque-volant: a flying disc, which is exactly what it is.",
+  "post-it note":"A papillon: a butterfly stuck to your monitor.",
+  "joystick":"A manche à balai: a broomstick. Witches were early gamers.",
+  "smiley":"A frimousse: a cute little face. Adorable, officially.",
+  "cash cow":"Vache à lait. Some things translate perfectly.",
+  "dunk":"Panier smashé. The Commission has range.",
+  "pace maker":"Le lièvre: the hare who sets the pace.",
+  "chick lit":"Romance urbaine. Bridget Jones, en Vélib'.",
+  "marketing":"Mercatique. Nobody says it. Be the first.",
+  "not in my back yard":"« Non au projet ici. » Translation is concise, at least.",
+  "burnout":"Four words in French instead of one. Exhausting.",
+  "brainstorming":"Literally: stir the brain-membranes.",
+  "binge watching":"Visionnage boulimique: as greedy as it sounds."
+};
+
+/* ======================= Professor (SVG) ======================= */
+function profSVG(mood="happy"){
+  const face = mood==="angry" ? "#f2a08e" : "#f2c9a5";
+  const brows = mood==="angry"
+    ? '<path d="M72 86 L94 94 M128 86 L106 94" stroke="#eee" stroke-width="6" stroke-linecap="round"/>'
+    : mood==="shock" ? '<path d="M72 80 Q83 72 94 80 M106 80 Q117 72 128 80" stroke="#eee" stroke-width="6" fill="none" stroke-linecap="round"/>'
+    : '<path d="M72 86 Q83 78 94 86 M106 86 Q117 78 128 86" stroke="#eee" stroke-width="6" fill="none" stroke-linecap="round"/>';
+  const mouth = mood==="angry" ? '<ellipse class="mouth" cx="100" cy="134" rx="11" ry="8" fill="#5a1515"/>'
+    : mood==="shock" ? '<ellipse class="mouth" cx="100" cy="135" rx="7" ry="10" fill="#5a1515"/>'
+    : '<path class="mouth" d="M89 131 Q100 142 111 131 Z" fill="#5a1515"/>';
+  return `<svg viewBox="0 -6 200 246" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Le professeur Dupont-Circonflexe">
+  <path d="M28 240 Q34 168 100 156 Q166 168 172 240 Z" fill="#2f5d3a" stroke="#14261a" stroke-width="3"/>
+  <path d="M100 160 L80 240 M100 160 L120 240" stroke="#d9b44a" stroke-width="3" fill="none"/>
+  <g fill="#d9b44a"><ellipse cx="62" cy="196" rx="9" ry="4" transform="rotate(-35 62 196)"/><ellipse cx="54" cy="212" rx="9" ry="4" transform="rotate(-35 54 212)"/><ellipse cx="138" cy="196" rx="9" ry="4" transform="rotate(35 138 196)"/><ellipse cx="146" cy="212" rx="9" ry="4" transform="rotate(35 146 212)"/><ellipse cx="70" cy="226" rx="9" ry="4" transform="rotate(-35 70 226)"/><ellipse cx="130" cy="226" rx="9" ry="4" transform="rotate(35 130 226)"/></g>
+  <path d="M86 158 L100 186 L114 158 Z" fill="#fff" stroke="#14261a" stroke-width="2"/>
+  <path d="M93 162 L100 176 L107 162 Z" fill="#c8323b"/>
+  <rect x="156" y="170" width="8" height="40" rx="3" fill="#d9b44a" stroke="#6b4f12" stroke-width="2" transform="rotate(18 160 190)"/>
+  <circle cx="57" cy="110" r="8" fill="${face}" stroke="#7a4b2f" stroke-width="2"/><circle cx="143" cy="110" r="8" fill="${face}" stroke="#7a4b2f" stroke-width="2"/>
+  <circle cx="100" cy="108" r="44" fill="${face}" stroke="#7a4b2f" stroke-width="3"/>
+  <path d="M60 96 Q50 128 62 140 M140 96 Q150 128 138 140" stroke="#eee" stroke-width="8" fill="none" stroke-linecap="round"/>
+  ${brows}
+  <circle cx="84" cy="100" r="5" fill="#1b1b2e"/><circle cx="116" cy="100" r="5" fill="#1b1b2e"/>
+  <circle cx="116" cy="100" r="12" fill="#ffffff30" stroke="#d9b44a" stroke-width="3"/>
+  <path d="M128 102 Q140 130 132 160" stroke="#d9b44a" stroke-width="1.5" fill="none"/>
+  <ellipse cx="100" cy="114" rx="9" ry="7" fill="#e39a7f"/>
+  ${mouth}
+  <path d="M100 122 Q86 118 74 124 Q64 130 60 122 Q66 134 80 132 Q92 130 100 126 Q108 130 120 132 Q134 134 140 122 Q136 130 126 124 Q114 118 100 122 Z" fill="#f4f4f4" stroke="#bbb" stroke-width="1.5"/>
+  <path d="M8 70 Q32 64 46 38 Q70 4 100 6 Q130 4 154 38 Q168 64 192 70 Q152 70 130 78 Q100 90 70 78 Q48 70 8 70 Z" fill="#1b1b2e" stroke="#000" stroke-width="2"/><circle cx="30" cy="58" r="5" fill="#2a2a3a"/><circle cx="42" cy="44" r="5" fill="#2a2a3a"/><circle cx="56" cy="31" r="5" fill="#2a2a3a"/><circle cx="72" cy="20" r="5" fill="#2a2a3a"/><circle cx="88" cy="13" r="5" fill="#2a2a3a"/><circle cx="104" cy="11" r="5" fill="#2a2a3a"/><circle cx="120" cy="14" r="5" fill="#2a2a3a"/><circle cx="136" cy="21" r="5" fill="#2a2a3a"/><circle cx="150" cy="32" r="5" fill="#2a2a3a"/><circle cx="163" cy="45" r="5" fill="#2a2a3a"/><circle cx="173" cy="57" r="5" fill="#2a2a3a"/><path d="M24 66 Q48 58 62 40 Q80 18 100 18 Q120 18 138 40 Q152 58 176 66" stroke="#d9b44a" stroke-width="2.5" fill="none"/><path d="M118 30 L126 66" stroke="#d9b44a" stroke-width="3"/><circle cx="118" cy="32" r="10" fill="#2b4ea2"/><circle cx="118" cy="32" r="6.5" fill="#fff"/><circle cx="118" cy="32" r="3" fill="#c8323b"/>
+  </svg>`;
+}
+
+/* ======================= Lines ======================= */
+const WRONG = [["Quel maladroit !","What a clumsy oaf!"],["Traître à la patrie de Molière !","Traitor to the land of Molière!"],["Saccageur de dictionnaire !","Dictionary vandal!"],["Quelle infamie !","What an outrage!"],["Mes oreilles saignent !","My ears are bleeding!"],["Oh là là !","Oh dear, oh dear."]];
+const LAND = [["Zut !","Drat!"],["Merde !","Pardon my French."],["Quelle boulette !","What a blunder!"],["Sacrebleu !","Good heavens!"],["Nom d'une pipe !","Great Scott!"],["Oh là là !","Oh dear, oh dear."]];
+const BIG = [["Plutôt mourir que d'entendre une telle infamie ! Un zéro pointé pour votre franglais !","I'd rather die than hear such an outrage! Zero out of twenty for your Franglais!"],["Par la barbe de Molière, nettoyez-moi ce baragouinage !","By Molière's beard, clean up this gibberish!"]];
+const PRAISE = [["Magnifique !","Magnificent!"],["Voilà du beau français !","Now that's proper French!"],["Bravo, mon brave !","Bravo, my good fellow!"],["Molière serait fier !","Molière would be proud!"],["Quelle élégance !","Such elegance!"]];
+const FRANGLAIS = ["On se fait un call ASAP ?","C'est trop disruptif !","Je te forwarde le mail","Ce process n'est pas scalable","Je suis overbooké","Check ta to-do list","Faut pitcher le deck","On debriefe en off ?","C'est un no-brainer","Je suis full jusqu'à lundi","On reste focus, la team !","Le cloud, c'est trop cool"];
+const RANKS = ["Touriste égaré","Apprenti du Bescherelle","Gardien de l'accent circonflexe","Chevalier du subjonctif","Commandeur de l'imparfait","Grand Maître de la Francophonie","Immortel honoraire"];
+const rank = waves => RANKS[Math.min(RANKS.length-1, waves)];
+const pick = a => a[Math.floor(Math.random()*a.length)];
+
+/* ======================= Helpers ======================= */
+const $ = id => document.getElementById(id);
+const sky = $("sky"), optionsEl = $("options"), cannon = $("cannon");
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/œ/g,"oe").replace(/[^a-z0-9]+/g," ").trim();
+function lev(a,b){ const m=a.length,n=b.length; const d=Array.from({length:m+1},(_,i)=>[i]); for(let j=1;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[m][n]; }
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ======================= Sound & voice ======================= */
+let soundOn = true, actx = null;
+function ctx(){ if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
+function tone(freq, start, dur, type="sawtooth", vol=.07){
+  const a = ctx(); if(!a || !soundOn) return;
+  const o=a.createOscillator(), g=a.createGain(), f=a.createBiquadFilter();
+  f.type="lowpass"; f.frequency.value=1800; o.type=type; o.frequency.value=freq; o.detune.value=(Math.random()*14)-7;
+  g.gain.setValueAtTime(0,a.currentTime+start); g.gain.linearRampToValueAtTime(vol,a.currentTime+start+.02);
+  g.gain.exponentialRampToValueAtTime(.001,a.currentTime+start+dur);
+  o.connect(f).connect(g).connect(a.destination); o.start(a.currentTime+start); o.stop(a.currentTime+start+dur+.05);
+}
+const sfx = {
+  hit(){ [523,659,784,1047].forEach((f,i)=>{ tone(f,i*.07,.22); tone(f*1.005,i*.07,.22); }); },
+  boom(){ tone(110,0,.25,"square",.09); },
+  wrong(){ tone(180,0,.18,"square",.06); tone(150,.1,.2,"square",.06); },
+  land(){ tone(90,0,.5,"triangle",.14); tone(70,.15,.5,"triangle",.12); },
+  pop(){ tone(880,0,.08,"triangle",.08); tone(1320,.05,.1,"triangle",.06); },
+  fanfare(){ [392,523,659,784,659,784].forEach((f,i)=>tone(f,i*.12,.25,"sawtooth",.06)); }
+};
+let frVoice = null;
+function loadVoices(){ try{ const vs = speechSynthesis.getVoices(); frVoice = vs.find(v=>v.lang==="fr-FR") || vs.find(v=>v.lang && v.lang.startsWith("fr")) || null; }catch(e){} }
+if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function say(text, {prof=false, onend}={}){
+  if(!soundOn || !("speechSynthesis" in window)){ onend && setTimeout(onend, 1200); return; }
+  try{
+    const u = new SpeechSynthesisUtterance(text); u.lang="fr-FR"; if(frVoice) u.voice=frVoice;
+    u.rate = prof ? 1.02 : .95; u.pitch = prof ? .75 : 1;
+    if(onend) u.onend = onend;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){ onend && onend(); }
+}
+
+/* ======================= Professor reactions ======================= */
+let popTimer;
+function profSays([fr,en], mood="angry", speak=true){
+  const p = $("profPop");
+  p.querySelector(".mini").innerHTML = profSVG(mood);
+  p.querySelector(".bub").innerHTML = esc(fr) + `<small>${esc(en)}</small>`;
+  p.classList.add("show"); clearTimeout(popTimer);
+  popTimer = setTimeout(()=>p.classList.remove("show"), Math.max(1800, fr.length*55));
+  if(speak) say(fr,{prof:true});
+}
+
+/* ======================= Dialogue system ======================= */
+function dialog(steps, done){
+  let i = 0;
+  const box = $("dialog");
+  function show(){
+    const s = steps[i];
+    box.hidden = false;
+    const prof = box.querySelector(".big-prof");
+    prof.innerHTML = profSVG(s.mood||"happy");
+    prof.style.animation="none"; void prof.offsetWidth; prof.style.animation="";
+    $("dFr").textContent = s.fr;
+    $("dEn").innerHTML = s.en;
+    $("dDots").innerHTML = steps.length>1 ? steps.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join("") : "";
+    const acts = $("dActs"); acts.innerHTML = "";
+    if(s.skip && i < steps.length-1){
+      const sk = document.createElement("button"); sk.className="big alt"; sk.textContent=s.skip;
+      sk.onclick = () => { speechSynthesis && speechSynthesis.cancel(); box.hidden = true; done && done(); };
+      acts.appendChild(sk); acts.append(" ");
+    }
+    const b = document.createElement("button"); b.className="big"; b.textContent = s.btn || "Continuer";
+    b.onclick = () => { if(i < steps.length-1){ i++; show(); } else { try{speechSynthesis.cancel();}catch(e){} box.hidden = true; done && done(); } };
+    acts.appendChild(b); b.focus();
+    prof.classList.add("talking");
+    say(s.fr, {prof:true, onend:()=>prof.classList.remove("talking")});
+  }
+  show();
+}
+
+const INTRO = [
+  {fr:"Alerte générale ! Les anglicismes envahissent le ciel de Paris !", en:"Red alert! Anglicisms are invading the skies over Paris!", mood:"shock", btn:"Quelle horreur !", skip:"Passer l'intro"},
+  {fr:"Je suis Hippolyte Dupont-Circonflexe, de l'Académie française.", en:"Members of the Académie are called « les Immortels ». I'm still working on that part. In the meantime, I guard the French language with my sword, my bicorne and my monocle.", skip:"Passer l'intro"},
+  {fr:"Heureusement, l'État veille.", en:"A very serious commission, placed under the authority of the <b>Prime Minister</b>, invents official French words to replace English ones. They're published in the <i>Journal officiel</i> and collected in a database called <b>FranceTerme</b>: more than 8,000 entries, from <i>mot-dièse</i> to <i>planchodrome</i>. And the Académie française has to approve them. That means me.", skip:"Passer l'intro"},
+  {fr:"Ces mots sont obligatoires… dans l'administration.", en:"For everyone else, they are merely <i>superior</i>. Some caught on (<i>courriel</i>, <i>covoiturage</i>). Others are still waiting for their big moment (<i>mercatique</i>, anyone?).", mood:"happy", skip:"Passer l'intro"},
+  {fr:"Votre mission : défendre la Machine !", en:`<ul class="howto">
+    <li>English words float down. Shoot each one with its <b>official French term</b> before it lands.</li>
+    <li>Pick an answer (or press <b>1</b>, <b>2</b>, <b>3</b>). Tap any word to aim at it.</li>
+    <li>Every third wave, a <b>boss</b> arrives, alone and slowly. Hit it three times: choose, then <b>type</b>, then (in Mode Académicien) <b>say it out loud</b>.</li>
+    <li>Turn on <b>🎙️ Mode Académicien</b> to fire by voice, for double points.</li></ul>`, btn:"Défendre la langue !"}
+];
+
+/* ======================= Game state ======================= */
+const T = {1:[],2:[],3:[]};
+DATA.terms.forEach(t => T[t.tier].push(t));
+let S;
+function fresh(){ return { running:false, words:[], score:0, purity:100, wave:1, toSpawn:0, spawned:0, spawnTimer:0, bossDone:false,
+  combo:0, wrongStreak:0, converted:0, voiceHits:0, bosses:0, missed:{}, seen:new Set(), target:null, manual:false, nextId:1, last:0, used:new Set(), paused:false, attackTimer:3 }; }
+function pool(){
+  const w = S.wave;
+  if(w<=2) return T[1];
+  if(w<=4) return T[1].concat(T[2]);
+  if(w<=6) return T[2].concat(T[3].slice(0,20));
+  return T[2].concat(T[3], T[3]);
+}
+
+function startWave(){
+  S.toSpawn = 4 + S.wave*2; S.spawned = 0; S.spawnTimer = .8; S.bossDone = S.wave % 3 !== 0;
+  $("wave").textContent = S.wave;
+  banner(S.wave % 3 === 0 ? `Vague ${S.wave} : un boss approche !` : `Vague ${S.wave}`);
+}
+function banner(text){ const b=$("bannerText"); b.textContent=text; b.classList.remove("show"); void b.offsetWidth; b.classList.add("show"); }
+
+function makeEl(cls, html){ const el=document.createElement("div"); el.className=cls; el.innerHTML=html; sky.appendChild(el); return el; }
+function spawnTerm(t, opts={}){
+  const isBoss = !!opts.boss;
+  const el = makeEl("word"+(isBoss?" boss":""), `<span class="eyes">ò_ó</span><span class="txt"></span>${isBoss?'<span class="hp">♥♥♥</span>':''}`);
+  el.querySelector(".txt").textContent = t.en;
+  const W = sky.clientWidth, ew = el.offsetWidth;
+  const w = { kind:isBoss?"boss":"term", t, el, hp:isBoss?3:1,
+    x: opts.x!=null ? Math.max(4, Math.min(W-ew-4, opts.x)) : 10 + Math.random()*Math.max(10, W-ew-20),
+    y: opts.y!=null ? opts.y : -el.offsetHeight-10,
+    speed: isBoss ? .012 : (.045 + Math.min(S.wave,10)*.008 + Math.random()*.02), locked:false, dead:false, wobble:Math.random()*6 };
+  el.addEventListener("pointerdown", e => { e.preventDefault(); if(!w.dead){ S.manual = true; setTarget(w, true); } });
+  S.words.push(w); return w;
+}
+function spawnRandom(){
+  const p = pool().filter(t => !S.words.some(w=>w.t===t));
+  let fresh = p.filter(t=>!S.used.has(t.en)); if(!fresh.length){ S.used.clear(); fresh = p; }
+  const t = pick(fresh); S.used.add(t.en); return spawnTerm(t);
+}
+function spawnFranglais(from){
+  const el = makeEl("franglais", "");
+  el.append(pick(FRANGLAIS));
+  const w = { kind:"fr", el, x: Math.max(4, Math.min(sky.clientWidth-el.offsetWidth-4, from.x + (Math.random()*120-60))), y: from.y + 40,
+    speed:.11, dead:false, locked:false, wobble:0 };
+  el.addEventListener("pointerdown", e => { e.preventDefault(); if(!w.dead) popFranglais(w); });
+  S.words.push(w);
+}
+
+/* ======================= Targeting & answer UI ======================= */
+const targets = () => S.words.filter(w=>!w.dead && w.kind!=="fr");
+function setTarget(w, force=false){
+  if(S.target === w && !force) return;
+  S.words.forEach(x=>x.el.classList.toggle("target", x===w));
+  S.target = w; renderAnswer();
+}
+function stageOf(w){ if(w.kind!=="boss") return "pick"; return w.hp===3 ? "decoy" : w.hp===2 ? "type" : (voiceOn ? "voice" : "decoy"); }
+function renderAnswer(){
+  optionsEl.innerHTML=""; $("typeBox").classList.remove("on"); $("hint").classList.remove("on");
+  optionsEl.style.display="";
+  const w = S.target;
+  if(!w){ $("prompt").textContent = S.running ? "En attente des anglicismes…" : ""; return; }
+  const st = stageOf(w);
+  if(st==="type"){
+    optionsEl.style.display="none";
+    $("prompt").innerHTML = `Boss « ${esc(w.t.en)} » : tapez le terme ! <em>(hit 2 of 3)</em>`;
+    $("typeBox").classList.add("on"); const inp=$("typeInput"); inp.value=""; inp.placeholder="Écrivez-le en français…";
+    w.reveal = w.reveal || 1; showHint(w);
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    return;
+  }
+  let choices;
+  if(w.kind==="boss"){
+    choices = [w.t.fr, ...w.t.decoys];
+    $("prompt").innerHTML = st==="voice"
+      ? `Boss « ${esc(w.t.en)} » : dites-le à voix haute ! <em>(×3 points, or pick it)</em>`
+      : `Boss « ${esc(w.t.en)} » : attention aux faux amis ! <em>(hit ${4-w.hp} of 3)</em>`;
+  } else {
+    const same = (T[w.t.tier]||[]).filter(t=>t.fr!==w.t.fr);
+    choices = [w.t.fr, ...shuffle(same.slice()).slice(0,2).map(t=>t.fr)];
+    $("prompt").textContent = `Cible : « ${w.t.en} »`;
+  }
+  shuffle(choices).forEach((fr,i)=>{
+    const b=document.createElement("button"); b.className="opt"; b.innerHTML=`<kbd>${i+1}</kbd>`; b.append(fr);
+    b.onclick = () => choose(b, fr); optionsEl.appendChild(b);
+  });
+}
+function showHint(w){
+  const fr = w.t.fr; let n = 0;
+  const h = [...fr].map(c => /[\s\-']/.test(c) ? (c===" "?"  ":c) : (n++ < w.reveal || (w.reveal>1 && Math.random()<.35) ? c : "_")).join("");
+  const words = fr.split(" ").map(s=>s[0]+"_".repeat(Math.max(0,s.length-1))).join("  ");
+  $("hint").textContent = w.reveal>1 ? h : words; $("hint").classList.add("on");
+}
+
+function choose(btn, fr){
+  if(!S.running || !S.target || S.target.locked || S.paused) return;
+  const w = S.target;
+  if(fr === w.t.fr){ btn.classList.add("right"); fire(w,false); }
+  else { btn.classList.add("wrong"); btn.disabled=true; mistake(w); }
+}
+function typed(){
+  const w = S.target; if(!w || w.locked || !S.running || S.paused) return;
+  const a = norm($("typeInput").value), b = norm(w.t.fr);
+  if(!a) return;
+  if(a===b || lev(a,b) <= Math.floor(b.length/9)){ fire(w,false); }
+  else { mistake(w); w.reveal = (w.reveal||1) + 3; showHint(w); $("typeInput").select(); }
+}
+$("typeFire").onclick = typed;
+$("typeInput").addEventListener("keydown", e => { if(e.key==="Enter"){ e.preventDefault(); typed(); } });
+
+function mistake(w){
+  S.combo=0; S.wrongStreak++; S.purity -= w.kind==="boss" ? 8 : 5; S.missed[w.t.en]=(S.missed[w.t.en]||0)+1;
+  shakeMachine(); sfx.wrong();
+  profSays((S.wrongStreak>=3 || w.kind==="boss") && Math.random()<.6 ? pick(BIG) : pick(WRONG), "angry");
+  if(S.wrongStreak>=3) S.wrongStreak=0;
+  hud();
+}
+
+/* ======================= Firing ======================= */
+function fire(w, byVoice){
+  w.locked = true;
+  const W=sky.clientWidth, H=sky.clientHeight;
+  const tx=w.x+w.el.offsetWidth/2, ty=w.y+w.el.offsetHeight/2;
+  const ang = Math.atan2(tx-W/2, H-ty)*180/Math.PI;
+  cannon.style.transform = `rotate(${Math.max(-70,Math.min(70,ang))}deg)`;
+  sfx.boom();
+  const ball = makeEl("ball","");
+  ball.animate([{transform:`translate(${W/2-8}px,${H}px)`},{transform:`translate(${tx-8}px,${ty-8}px)`}],{duration:260,easing:"ease-in"}).onfinish = () => { ball.remove(); impact(w, byVoice); };
+}
+function floatText(cls, txt, x, y){
+  const s = makeEl(cls,""); s.textContent=txt; s.style.left=x+"px"; s.style.top=y+"px";
+  s.animate([{opacity:1,transform:"translateY(0)"},{opacity:0,transform:"translateY(-40px)"}],{duration:1000}).onfinish=()=>s.remove();
+}
+function impact(w, byVoice){
+  if(w.dead) return;
+  const cx = w.x + w.el.offsetWidth/2, cy = w.y + w.el.offsetHeight/2;
+  puffs(cx, cy); S.wrongStreak = 0;
+  if(w.kind==="boss" && w.hp>1){
+    w.hp--; w.locked=false;
+    w.el.querySelector(".hp").textContent = "♥".repeat(w.hp);
+    S.score += byVoice ? 60 : 30; floatText("pts", `+${byVoice?60:30}`, cx, cy-30);
+    sfx.wrong();
+    if(w.hp===2) profSays(["Il chancelle ! Maintenant, écrivez-le !","It's wobbling! Now type it!"],"shock",false);
+    if(S.target===w) renderAnswer(); hud(); return;
+  }
+  w.dead = true; S.combo++; S.converted++; if(byVoice) S.voiceHits++;
+  if(w.kind==="boss"){ S.bosses++; S.bossDone = true; S.spawnTimer = 2; }
+  const mult = Math.min(5, 1+Math.floor(S.combo/3));
+  const pts = (w.kind==="boss"?150:10) * mult * (byVoice ? (w.kind==="boss"?3:2) : 1);
+  S.score += pts; floatText("pts", `+${pts}`, cx, cy-30);
+  const el = w.el; el.classList.remove("target"); el.classList.add("converted");
+  el.querySelector(".eyes").textContent="^‿^"; el.querySelector(".txt").textContent=w.t.fr;
+  const hp=el.querySelector(".hp"); if(hp) hp.remove();
+  el.appendChild(Object.assign(document.createElement("span"),{className:"beret"}));
+  requestAnimationFrame(()=>{ el.style.transform=`translate(${w.x}px,${w.y-60}px)`; el.style.opacity=0; });
+  setTimeout(()=>el.remove(),1500);
+  sfx.hit();
+  if(w.kind==="boss"){ sfx.fanfare(); banner("Boss francisé !"); profSays(pick(PRAISE),"happy"); }
+  else if(S.combo>0 && S.combo%5===0){ profSays(pick(PRAISE),"happy"); }
+  else say(w.t.fr);
+  if(!S.seen.has(w.t.en)){ S.seen.add(w.t.en); showFact(w.t); }
+  S.words = S.words.filter(x=>x!==w);
+  if(S.target===w){ S.target=null; S.manual=false; }
+  hud();
+}
+function popFranglais(w){
+  w.dead=true; S.words=S.words.filter(x=>x!==w);
+  puffs(w.x+w.el.offsetWidth/2, w.y+10); sfx.pop(); S.score+=5;
+  floatText("pts","+5", w.x, w.y-10); w.el.remove(); hud();
+}
+function puffs(x,y){
+  for(let i=0;i<8;i++){
+    const p = makeEl("puff",""); const a=Math.random()*Math.PI*2, d=20+Math.random()*30;
+    p.animate([{transform:`translate(${x}px,${y}px) scale(.6)`,opacity:1},{transform:`translate(${x+Math.cos(a)*d}px,${y+Math.sin(a)*d}px) scale(1.8)`,opacity:0}],{duration:600,easing:"ease-out"}).onfinish=()=>p.remove();
+  }
+}
+let factTimer;
+function showFact(t){
+  const f=$("fact");
+  f.innerHTML = `<b>${esc(t.en)} → ${esc(t.fr)}</b>` + (JOKES[t.en]?`<br>${esc(JOKES[t.en])}`:"") + (t.d?`<i>« ${esc(t.d)} »</i>`:"") + (t.year?`<small>Journal officiel, ${esc(t.year)}</small>`:"");
+  f.classList.add("show"); clearTimeout(factTimer); factTimer=setTimeout(()=>f.classList.remove("show"),4200);
+}
+function shakeMachine(){ const m=$("machine"); m.classList.remove("shake"); void m.offsetWidth; m.classList.add("shake"); }
+
+function land(w){
+  w.dead=true; S.words=S.words.filter(x=>x!==w); w.el.remove();
+  if(w.kind==="fr"){ S.purity -= 6; profSays(["Mes oreilles saignent !","My ears are bleeding!"],"angry"); }
+  else {
+    S.purity -= w.kind==="boss" ? 35 : 15; S.combo=0; S.missed[w.t.en]=(S.missed[w.t.en]||0)+2;
+    if(w.kind==="boss") S.bossDone = true;
+    floatText("splat", w.kind==="boss" ? "Sacrebleu !" : pick(["Oh là là !","Zut !","Aïe !"]), Math.max(0,w.x), sky.clientHeight-40);
+    profSays(w.kind==="boss" ? pick(BIG) : pick(LAND), "angry");
+  }
+  shakeMachine(); sfx.land();
+  if(S.target===w){ S.target=null; S.manual=false; }
+  hud();
+}
+function hud(){
+  S.purity = Math.max(0, Math.min(100, S.purity));
+  $("score").textContent = S.score; $("gaugeFill").style.width = S.purity+"%";
+  if(S.purity<=0 && S.running) gameOver();
+}
+
+/* ======================= Main loop ======================= */
+function loop(t){
+  if(!S.running) return;
+  const dt = Math.min(.05, (t-(S.last||t))/1000); S.last = t;
+  if(S.paused){ requestAnimationFrame(loop); return; }
+  const H = sky.clientHeight;
+  S.spawnTimer -= dt;
+  if(S.spawned < S.toSpawn && S.spawnTimer <= 0){
+    const bossAlive = S.words.some(w=>w.kind==="boss");
+    const bossDue = !S.bossDone && S.spawned === Math.floor(S.toSpawn/2);
+    if(bossAlive){ /* the boss fights alone: hold all other words */ }
+    else if(bossDue){
+      if(targets().length===0){
+        const b = pick(DATA.bosses.filter(b=>!S.used.has(b.en))) || pick(DATA.bosses); S.used.add(b.en);
+        spawnTerm(b,{boss:true, y:70}); S.spawned++;
+        banner("Le boss arrive !");
+      }
+    } else { spawnRandom(); S.spawned++; S.spawnTimer = Math.max(.9, 2.6 - S.wave*.16) + Math.random()*.8; }
+  }
+  for(const w of [...S.words]){
+    if(w.dead) continue;
+    if(!w.locked) w.y += w.speed*H*dt*(w.kind==='boss' && stageOf(w)==='type' ? .5 : 1);
+    w.wobble += dt*2;
+    w.el.style.transform = `translate(${w.x + (w.kind==="fr"?0:Math.sin(w.wobble)*6)}px,${w.y}px) rotate(${w.kind==="fr"?0:Math.sin(w.wobble*.8)*3}deg)`;
+    if(w.y + w.el.offsetHeight >= H-4 && !w.locked) land(w);
+  }
+  if(!S.running) return;
+  if(!S.target || S.target.dead || !S.manual){
+    const ts = targets(); const low = ts.length ? ts.reduce((a,b)=>b.y>a.y?b:a) : null;
+    // don't yank the target away while the player is typing for a boss
+    if(!(S.target && !S.target.dead && stageOf(S.target)==="type")) setTarget(low);
+    else if(S.target.dead) setTarget(low);
+  }
+  if(S.spawned>=S.toSpawn && S.words.length===0 && S.bossDone){ waveCleared(); return; }
+  requestAnimationFrame(loop);
+}
+
+function waveCleared(){
+  S.paused = true; S.purity = Math.min(100, S.purity+15); hud();
+  const r = rank(S.wave), lines = [
+    ["Bravo ! La vague est repoussée !", `The skies are clear, for now. For services rendered to the French language, you are promoted to: <b>${r}</b>.`],
+    ["Magnifique ! Molière applaudit depuis sa tombe.", `Your new title: <b>${r}</b>. Purity restored a little. Don't let it go to your head.`],
+    ["Pas mal… pour un débutant.", `Promotion: <b>${r}</b>. The next wave is faster. Much faster. I've heard rumours of « growth hacking ».`],
+    ["Splendide ! Je vous décernerais bien une épée.", `Rank: <b>${r}</b>. Académie swords are custom-made, so you'll have to wait.`]
+  ];
+  const [fr,en] = lines[(S.wave-1) % lines.length];
+  sfx.fanfare();
+  dialog([{fr, en: en + (S.wave%3===2 ? "<br><br>⚠️ Next wave: a <b>boss</b>. Choose, type, then shout." : ""), mood:"happy", btn:`Vague ${S.wave+1}`}], () => {
+    S.wave++; S.paused=false; S.last=0; S.target=null; S.manual=false; startWave(); requestAnimationFrame(loop);
+  });
+}
+
+/* ======================= Voice recognition ======================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, voiceOn=false;
+function heard(text){ const h=$("heard"); h.textContent="J'ai entendu : « "+text+" »"; h.classList.add("show"); clearTimeout(h._t); h._t=setTimeout(()=>h.classList.remove("show"),1800); }
+function setupVoice(){
+  if(!SR) return false;
+  rec = new SR(); rec.lang="fr-FR"; rec.continuous=true; rec.interimResults=true;
+  rec.onresult = e => {
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const txt=e.results[i][0].transcript, n=norm(txt); heard(txt.trim());
+      if(!S || !S.running || S.paused) continue;
+      const hit = targets().find(w=>!w.locked && n.includes(norm(w.t.fr)));
+      if(hit){ fire(hit,true); try{rec.abort();}catch(_){} break; }
+    }
+  };
+  rec.onend = () => { if(voiceOn){ try{rec.start();}catch(_){} } };
+  rec.onerror = e => { if(e.error==="not-allowed"||e.error==="service-not-allowed"){ voiceOn=false; $("voiceBtn").setAttribute("aria-pressed","false"); heard("Micro refusé : autorisez le micro pour jouer à la voix."); } };
+  return true;
+}
+$("voiceBtn").onclick = () => {
+  if(!rec && !setupVoice()){ heard("La reconnaissance vocale n'est pas disponible dans ce navigateur. Essayez Chrome."); return; }
+  voiceOn=!voiceOn; $("voiceBtn").setAttribute("aria-pressed",voiceOn);
+  if(voiceOn){ try{rec.start(); heard("Je vous écoute… dites le mot français !");}catch(_){} } else { try{rec.stop();}catch(_){} }
+  if(S && S.target) renderAnswer();
+};
+$("soundBtn").onclick = () => { soundOn=!soundOn; $("soundBtn").setAttribute("aria-pressed",soundOn); $("soundBtn").textContent = soundOn?"🔊 Son et voix":"🔇 Son et voix"; if(!soundOn) try{speechSynthesis.cancel();}catch(e){} };
+
+document.addEventListener("keydown", e => {
+  if(document.activeElement && document.activeElement.tagName==="INPUT") return;
+  const i=["1","2","3"].indexOf(e.key);
+  if(i>=0){ const b=optionsEl.children[i]; if(b && !b.disabled) b.click(); }
+});
+
+/* ======================= Start / game over ======================= */
+function start(){
+  ctx(); if(actx && actx.state==="suspended") actx.resume();
+  sky.querySelectorAll(".word,.ball,.puff,.splat,.franglais,.pts").forEach(n=>n.remove());
+  S = fresh(); S.running = true; cannon.style.transform="";
+  $("over").hidden = true; hud(); renderAnswer(); startWave(); requestAnimationFrame(loop);
+}
+function weakest(){ const e = Object.entries(S.missed).sort((a,b)=>b[1]-a[1])[0]; if(!e) return null;
+  const t = DATA.terms.concat(DATA.bosses).find(t=>t.en===e[0]); return t; }
+let shareBlob = null, shareText = "";
+function gameOver(){
+  S.running=false; try{ if(voiceOn) rec.stop(); }catch(_){}
+  const wk = weakest(), r = rank(S.wave-1);
+  shareText = `🎩🇫🇷 J'ai francisé ${S.converted} anglicismes dans Opération La Défense (score ${S.score}, vague ${S.wave}). Mon grade : ${r}.` + (wk?` Mon point faible : « ${wk.en} » (= ${wk.fr}).`:"") + " Et vous, vous dites « mot-dièse » ?";
+  const verdict = S.score > 1500 ? ["Vous n'avez pas démérité. Presque digne de l'Académie.","Not bad at all. Almost worthy of the Académie."]
+    : S.score > 500 ? ["La Machine a cédé, mais l'honneur est sauf.","The Machine fell, but your honour is intact."]
+    : pick(BIG);
+  dialog([{fr:verdict[0], en:verdict[1] + `<br><br>Final rank: <b>${r}</b>.` + (wk?` Your nemesis: <b>${esc(wk.en)}</b>, which you should call « ${esc(wk.fr)} ».`:""), mood: S.score>500?"happy":"angry", btn:"Voir mon score"}], showOver);
+}
+async function showOver(){
+  $("over").hidden=false; $("overTitle").textContent = `${S.converted} anglicismes francisés`;
+  $("overStats").textContent = `Score ${S.score}, vague ${S.wave}, ${S.bosses} boss vaincu${S.bosses>1?"s":""}` + (S.voiceHits?`, ${S.voiceHits} tirs à la voix`:"") + ".";
+  $("saveBtn").textContent="Enregistrer l'image"; $("copyBtn").textContent="Copier le texte";
+  $("shareImg").removeAttribute("src");
+  try{ shareBlob = await makeCard(); $("shareImg").src = URL.createObjectURL(shareBlob); }catch(e){ console.error(e); shareBlob=null; }
+  $("againBtn").focus();
+}
+
+/* ======================= Share card (canvas → PNG) ======================= */
+if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();};}
+function wrap(c, text, x, y, maxW, lh){
+  const words=text.split(" "); let line=""; for(const w of words){ const test=line?line+" "+w:w;
+    if(c.measureText(test).width>maxW && line){ c.fillText(line,x,y); line=w; y+=lh; } else line=test; }
+  c.fillText(line,x,y); return y;
+}
+function loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+async function makeCard(withProf=true){
+  try{ await Promise.all([document.fonts.load('80px Limelight'), document.fonts.load('800 40px "Alegreya Sans"'), document.fonts.load('400 30px "Alegreya Sans"')]); }catch(e){}
+  const W=1080, H=1350, cv=document.createElement("canvas"); cv.width=W; cv.height=H; const c=cv.getContext("2d");
+  const g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,"#1c2848"); g.addColorStop(1,"#5b5f86"); c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.save(); c.globalAlpha=.4; c.translate(0,H-420); c.scale(W/900,420/300); c.fillStyle="#0b1020";
+  c.fill(new Path2D(document.querySelector("#skyline path").getAttribute("d"))); c.restore();
+  // brass frame
+  c.lineWidth=18; c.strokeStyle="#c9a34a"; c.strokeRect(24,24,W-48,H-48);
+  c.lineWidth=4; c.strokeStyle="#7a5a1e"; c.strokeRect(44,44,W-88,H-88);
+  c.textAlign="center"; c.fillStyle="#f0d58a"; c.font='92px Limelight'; c.fillText("Opération",W/2,170); c.fillText("La Défense",W/2,270);
+  c.font='italic 400 34px "Alegreya Sans"'; c.fillStyle="#f6ecd2"; c.fillText("Les anglicismes n'ont qu'à bien se tenir",W/2,330);
+  // paper card
+  c.fillStyle="#efe3c4"; c.strokeStyle="#2a1d14"; c.lineWidth=6;
+  c.beginPath(); c.roundRect(110,380,W-220,560,26); c.fill(); c.stroke();
+  c.fillStyle="#2b4ea2"; c.font='800 210px "Alegreya Sans"'; c.fillText(String(S.converted),W/2,600);
+  c.fillStyle="#2a1d14"; c.font='800 46px "Alegreya Sans"'; c.fillText("anglicismes francisés",W/2,665);
+  c.font='400 36px "Alegreya Sans"'; c.fillText(`Score ${S.score}   |   Vague ${S.wave}   |   ${S.bosses} boss`,W/2,730);
+  c.fillStyle="#c8323b"; c.font='44px Limelight'; c.fillText(rank(S.wave-1),W/2,808);
+  const wk=weakest(); c.fillStyle="#2a1d14"; c.font='italic 400 32px "Alegreya Sans"';
+  if(wk) wrap(c, `Point faible : « ${wk.en} », alias « ${wk.fr} »`, W/2, 872, W-300, 40);
+  // professor + speech bubble
+  if(withProf){ const img=await loadImg("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(profSVG(S.score>500?"happy":"angry"))); c.drawImage(img,100,950,250,300); }
+  c.fillStyle="#fff"; c.strokeStyle="#2a1d14"; c.lineWidth=5; c.beginPath(); c.roundRect(400,990,580,180,24); c.fill(); c.stroke();
+  c.beginPath(); c.moveTo(410,1110); c.lineTo(360,1140); c.lineTo(420,1140); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle="#2a1d14"; c.textAlign="left"; c.font='800 38px "Alegreya Sans"';
+  wrap(c, S.score>1500?"« Presque digne de l'Académie ! »":S.score>500?"« L'honneur est sauf ! »":"« Un zéro pointé pour votre franglais ! »", 430, 1060, 520, 46);
+  c.font='400 26px "Alegreya Sans"'; c.fillText("Et vous, vous dites « mot-dièse » ?",430,1145);
+  c.textAlign="center"; c.fillStyle="#f6ecd2"; c.font='400 26px "Alegreya Sans"';
+  c.fillText("Termes officiels : base FranceTerme, ministère de la Culture",W/2,H-62);
+  return await new Promise((res,rej)=>{ try{ cv.toBlob(b=>b?res(b):rej(new Error("toBlob")),"image/png"); }catch(e){ if(withProf) makeCard(false).then(res,rej); else rej(e); } });
+}
+
+const downloadsP = (window.claude && typeof window.claude.use==="function") ? window.claude.use("downloads").catch(()=>null) : Promise.resolve(null);
+$("saveBtn").onclick = async () => {
+  if(!shareBlob) return;
+  const note=$("saveNote"), name="operation-la-defense-score.png";
+  const dl = await downloadsP;
+  if(dl){
+    try{ await dl.save({filename:name, data:shareBlob}); note.textContent="Image enregistrée."; }
+    catch(e){ note.textContent = e && e.code==="declined" ? "Enregistrement annulé." : "L'enregistrement n'est pas disponible ici : appuyez longuement sur l'image."; }
+    return;
+  }
+  const file = new File([shareBlob], name, {type:"image/png"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], text:shareText}); return; }catch(e){ if(e.name==="AbortError") return; }
+  }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(shareBlob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  note.textContent="Image téléchargée.";
+};
+$("copyBtn").onclick = async () => {
+  try{ await navigator.clipboard.writeText(shareText); $("copyBtn").textContent="Copié !"; }
+  catch(e){ $("saveNote").textContent = shareText; }
+};
+$("againBtn").onclick = start;
+
+/* ======================= Boot ======================= */
+S = fresh();
+$("prompt").textContent = "";
+dialog(INTRO, start);
+</script>
+</body>
+</html>

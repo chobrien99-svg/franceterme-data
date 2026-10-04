@@ -43,6 +43,25 @@
             font-style: italic;
         }
 
+        .game-link {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 10px 22px;
+            background: rgba(255,255,255,0.18);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .game-link:hover,
+        .game-link:focus-visible {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
         .mode-selector {
             display: flex;
             justify-content: center;
@@ -611,6 +630,7 @@
         <header>
             <h1>🇫🇷 FranceTerme</h1>
             <p class="subtitle">Les nouveaux mots français qui enrichissent notre belle langue!</p>
+            <a class="game-link" href="/game">🎩 Jouer à Opération La Défense</a>
         </header>
 
         <div class="stats-panel">

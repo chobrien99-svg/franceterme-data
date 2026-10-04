@@ -106,6 +106,23 @@ Connectez votre repo GitHub sur https://pages.cloudflare.com
 - `analyze_terms.py` - Script d'analyse et d'extraction Python
 - `API_DOCUMENTATION.md` - Documentation complète de l'API FranceTerme
 
+## 🎩 Game: Opération La Défense
+
+An arcade game built on 226 curated FranceTerme terms, served at `/game` on Vercel.
+
+- `game/index.html` - the game itself (one self-contained file, no build step)
+- `tools/game/gamedata.json` - the curated word list (terms in three tiers, plus bosses)
+- `tools/game/template.html` - the game code; `build_game.py` injects the data into it
+- `tools/game/build_game.py` - rebuilds `game/index.html`
+
+To refresh after a new FranceTerme release:
+
+1. Download the latest `FranceTerme.xml` (http://www.franceterme.culture.gouv.fr/public/FranceTerme.xml) into the repo root
+2. Run `python3 tools/game/build_game.py` (any "check" line means a term changed in the database and should be reviewed)
+3. Commit and push; Vercel redeploys automatically
+
+See `tools/game/README.md` for how to embed the game in Ghost.
+
 ## 🎨 Caractéristiques de Design
 
 - **Animations fluides** - Transitions douces et effets de hover

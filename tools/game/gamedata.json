@@ -1,0 +1,1642 @@
+{
+ "terms": [
+  {
+   "en": "hashtag",
+   "fr": "mot-dièse",
+   "year": "2013",
+   "tier": 1,
+   "d": "Suite signifiante de caractères sans espace commençant par le signe # (dièse), qui signale un sujet d'intérêt et est insérée dans un message par…"
+  },
+  {
+   "en": "e-mail",
+   "fr": "courriel",
+   "year": "2003",
+   "tier": 1,
+   "d": "Document informatisé qu'un utilisateur saisit, envoie ou consulte en différé par l'intermédiaire d'un réseau."
+  },
+  {
+   "en": "fake news",
+   "fr": "infox",
+   "year": "2020",
+   "tier": 1,
+   "d": "Information mensongère ou délibérément biaisée."
+  },
+  {
+   "en": "chatbot",
+   "fr": "dialogueur",
+   "year": "2018",
+   "tier": 1,
+   "d": "Logiciel spécialisé dans le dialogue en langage naturel avec un humain, qui est capable notamment de répondre à des questions ou de déclencher…"
+  },
+  {
+   "en": "big data",
+   "fr": "mégadonnées",
+   "year": "2014",
+   "tier": 1,
+   "d": "Données structurées ou non dont le très grand volume requiert des outils d'analyse adaptés."
+  },
+  {
+   "en": "blockchain",
+   "fr": "chaîne de blocs",
+   "year": "2017",
+   "tier": 1,
+   "d": "Mode d’enregistrement de données produites en continu, sous forme de blocs liés les uns aux autres dans l’ordre chronologique de leur validation,…"
+  },
+  {
+   "en": "cookie",
+   "fr": "témoin de connexion",
+   "year": "1999",
+   "tier": 1,
+   "d": "Appliquette envoyée par un serveur de la toile à un utilisateur, parfois à l'insu de celui-ci, au cours d'une connexion afin de caractériser cet…"
+  },
+  {
+   "en": "hacker",
+   "fr": "fouineur",
+   "year": "1999",
+   "tier": 1,
+   "d": "Personne passionnée d'informatique qui, par jeu, curiosité, défi personnel ou par souci de notoriété, sonde, au hasard plutôt qu'à l'aide de…"
+  },
+  {
+   "en": "start-up",
+   "fr": "jeune pousse",
+   "year": "2001",
+   "tier": 1,
+   "d": "Jeune entreprise innovante et dynamique, à croissance rapide."
+  },
+  {
+   "en": "newsletter",
+   "fr": "infolettre",
+   "year": "2024",
+   "tier": 1,
+   "d": "Bulletin périodique d'information destiné à un public déterminé, souvent diffusé par voie numérique."
+  },
+  {
+   "en": "coworking",
+   "fr": "cotravail",
+   "year": "2016",
+   "tier": 1,
+   "d": "Mode de travail consistant, pour des professionnels indépendants, à partager espace, poste de travail, expérience ou compétences."
+  },
+  {
+   "en": "e-commerce",
+   "fr": "commerce en ligne",
+   "year": "2000",
+   "tier": 1,
+   "d": "Technique d'achat et de vente à distance utilisant des procédés électroniques qui permettent la liaison directe et instantanée entre le vendeur et…"
+  },
+  {
+   "en": "e-book",
+   "fr": "livre numérique",
+   "year": "2012",
+   "tier": 1,
+   "d": "Ouvrage édité et diffusé sous forme numérique, destiné à être lu sur un écran."
+  },
+  {
+   "en": "bug",
+   "fr": "bogue",
+   "year": "2000",
+   "tier": 1,
+   "d": "Défaut de conception ou de réalisation se manifestant par des anomalies de fonctionnement."
+  },
+  {
+   "en": "software",
+   "fr": "logiciel",
+   "year": "2000",
+   "tier": 1,
+   "d": "Ensemble des programmes, procédés et règles, et éventuellement de la documentation, relatifs au fonctionnement d'un ensemble de traitement de données."
+  },
+  {
+   "en": "hardware",
+   "fr": "matériel",
+   "year": "2000",
+   "tier": 1,
+   "d": "Ensemble des éléments physiques employés pour le traitement de données."
+  },
+  {
+   "en": "smiley",
+   "fr": "frimousse",
+   "year": "1999",
+   "tier": 1,
+   "d": "Dans un message, association facétieuse de quelques caractères typographiques qui évoquent un visage expressif."
+  },
+  {
+   "en": "think tank",
+   "fr": "laboratoire d'idées",
+   "year": "1998",
+   "tier": 1,
+   "d": "Groupe plus ou moins formel dont les membres interviennent dans les débats publics sur les grands problèmes économiques et de société,…"
+  },
+  {
+   "en": "food truck",
+   "fr": "camion de restauration",
+   "year": "2016",
+   "tier": 1,
+   "d": "Camion équipé pour confectionner rapidement des mets, le plus souvent élaborés, à emporter ou à consommer sur place."
+  },
+  {
+   "en": "pop-up store",
+   "fr": "boutique éphémère",
+   "year": "2016",
+   "tier": 1,
+   "d": "Magasin conçu pour une durée de vie de quelques jours, semaines ou mois, en vue de faire connaître une marque ou un produit."
+  },
+  {
+   "en": "escape game",
+   "fr": "jeu d'évasion",
+   "year": "2019",
+   "tier": 1,
+   "d": "Jeu, construit autour d’un scénario, qui consiste à résoudre, collectivement et dans un temps limité, un problème ou une énigme afin de s’échapper…"
+  },
+  {
+   "en": "fast fashion",
+   "fr": "mode express",
+   "year": "2020",
+   "tier": 1,
+   "d": "Secteur de la mode qui repose sur un modèle économique caractérisé par le renouvellement très rapide de collections d’articles à bas prix."
+  },
+  {
+   "en": "mountain bike",
+   "fr": "vélo tout-terrain",
+   "year": "2000",
+   "tier": 1,
+   "d": ""
+  },
+  {
+   "en": "snowboard",
+   "fr": "planche de neige",
+   "year": "2026",
+   "tier": 1,
+   "d": "Planche de sport, généralement équipée de fixations pour les pieds, conçue pour permettre d’évoluer en position debout sur la neige."
+  },
+  {
+   "en": "airbag",
+   "fr": "sac gonflable",
+   "year": "2000",
+   "tier": 1,
+   "d": "Dispositif de sécurité constitué par une enveloppe souple qui, en cas de choc, se gonfle instantanément en s'interposant entre l'occupant et les…"
+  },
+  {
+   "en": "firewall",
+   "fr": "pare-feu",
+   "year": "2022",
+   "tier": 1,
+   "d": "Dispositif informatique qui filtre les flux d’informations entre un réseau interne à un organisme et un réseau externe, en vue de neutraliser les…"
+  },
+  {
+   "en": "malware",
+   "fr": "logiciel malveillant",
+   "year": "2005",
+   "tier": 1,
+   "d": "Ensemble de programmes conçu par un pirate pour être implanté dans un système afin d'y déclencher une opération non autorisée ou d'en perturber le…"
+  },
+  {
+   "en": "search engine",
+   "fr": "moteur de recherche",
+   "year": "2000",
+   "tier": 1,
+   "d": "Système d'exploitation de banque de données, et, par extension, serveur spécialisé permettant d'accéder sur la toile à des ressources (pages,…"
+  },
+  {
+   "en": "touch screen",
+   "fr": "écran tactile",
+   "year": "2000",
+   "tier": 1,
+   "d": "Écran muni d'un dispositif qui permet de sélectionner certaines de ses zones par contact."
+  },
+  {
+   "en": "drag and drop",
+   "fr": "glisser-déposer",
+   "year": "1999",
+   "tier": 1,
+   "d": "Action par laquelle l'utilisateur sélectionne un objet à l'écran, le déplace jusqu'à une autre position, puis le lâche pour déclencher une action…"
+  },
+  {
+   "en": "win-win",
+   "fr": "gagnant-gagnant",
+   "year": "2005",
+   "tier": 1,
+   "d": "Se dit du résultat d'une négociation favorable à chacune des parties."
+  },
+  {
+   "en": "speed dating",
+   "fr": "rencontre express",
+   "year": "2010",
+   "tier": 1,
+   "d": "Organisation de rencontres croisées au sein d'un groupe dans un temps limité."
+  },
+  {
+   "en": "car pool",
+   "fr": "covoiturage",
+   "year": "2000",
+   "tier": 1,
+   "d": "Utilisation en commun d'une voiture particulière."
+  },
+  {
+   "en": "camping-car",
+   "fr": "autocaravane",
+   "year": "2000",
+   "tier": 1,
+   "d": "Caravane autotractée ou véhicule automobile dont l'intérieur est équipé pour le séjour."
+  },
+  {
+   "en": "know-how",
+   "fr": "savoir-faire",
+   "year": "2000",
+   "tier": 1,
+   "d": ""
+  },
+  {
+   "en": "call center",
+   "fr": "centre d'appels",
+   "year": "2003",
+   "tier": 1,
+   "d": "Ensemble d'agents utilisant des moyens de télécommunication et d'informatique pour assurer les contacts d'une entreprise avec sa clientèle."
+  },
+  {
+   "en": "data center",
+   "fr": "centre de données",
+   "year": "2019",
+   "tier": 1,
+   "d": "Site physique où sont regroupées des infrastructures informatiques et de télécommunication destinées à stocker, à traiter ou à distribuer des…"
+  },
+  {
+   "en": "hoax",
+   "fr": "canular",
+   "year": "2005",
+   "tier": 1,
+   "d": "Information fausse transmise par messagerie électronique et incitant les destinataires abusés à effectuer des opérations ou à prendre des…"
+  },
+  {
+   "en": "hat trick",
+   "fr": "coup du chapeau",
+   "year": "2011",
+   "tier": 1,
+   "d": "Prouesse qui, dans certains sports collectifs, consiste pour un joueur à marquer trois buts au cours d'une même partie."
+  },
+  {
+   "en": "prime time",
+   "fr": "heure de grande écoute",
+   "year": "2005",
+   "tier": 1,
+   "d": "Tranche horaire où l'audience est la plus forte."
+  },
+  {
+   "en": "flashback",
+   "fr": "retour en arrière",
+   "year": "2005",
+   "tier": 1,
+   "d": "Rupture de la continuité chronologique d'une action par l'évocation d'une période antérieure."
+  },
+  {
+   "en": "marketing",
+   "fr": "mercatique",
+   "year": "2018",
+   "tier": 1,
+   "d": "Ensemble des techniques et des actions grâce auxquelles une entreprise développe méthodiquement la vente de ses produits et de ses services en…"
+  },
+  {
+   "en": "database",
+   "fr": "base de données",
+   "year": "2000",
+   "tier": 1,
+   "d": ""
+  },
+  {
+   "en": "home office",
+   "fr": "bureau à domicile",
+   "year": "2006",
+   "tier": 1,
+   "d": ""
+  },
+  {
+   "en": "machine learning",
+   "fr": "apprentissage automatique",
+   "year": "2018",
+   "tier": 1,
+   "d": "Processus par lequel un algorithme évalue et améliore ses performances sans l’intervention d’un programmeur, en répétant son exécution sur des…"
+  },
+  {
+   "en": "web",
+   "fr": "toile",
+   "year": "2018",
+   "tier": 1,
+   "d": "Système de publication, de gestion et de consultation de documents et d’autres ressources, qui est réparti géographiquement et structurellement…"
+  },
+  {
+   "en": "podcast",
+   "fr": "audio",
+   "year": "2020",
+   "tier": 1,
+   "d": "Contenu audio mis à la disposition du public dans l’internet."
+  },
+  {
+   "en": "smartphone",
+   "fr": "mobile multifonction",
+   "year": "2018",
+   "tier": 1,
+   "d": "Terminal mobile qui assure la téléphonie et l’accès à l’internet par voie radioélectrique, ainsi que d’autres fonctions informatiques ou multimédias."
+  },
+  {
+   "en": "deepfake",
+   "fr": "infox vidéo",
+   "year": "2020",
+   "tier": 1,
+   "d": "Infox qui se présente sous la forme d’une vidéo falsifiée grâce aux techniques de l’intelligence artificielle, en particulier à celles de…"
+  },
+  {
+   "en": "open space",
+   "fr": "plateau",
+   "year": "2006",
+   "tier": 1,
+   "d": "Vaste local pourvu d'équipements de base et libre d'aménagements."
+  },
+  {
+   "en": "low cost",
+   "fr": "à coûts réduits",
+   "year": "2018",
+   "tier": 1,
+   "d": "Se dit d’une stratégie de réduction des coûts, caractérisée par une offre concentrée sur les seules fonctions essentielles, pour le client, d’un…"
+  },
+  {
+   "en": "replay tv",
+   "fr": "télévision de rattrapage",
+   "year": "2023",
+   "tier": 1,
+   "d": "Service de rattrapage qui permet de voir ou de revoir un programme télévisé."
+  },
+  {
+   "en": "mouse",
+   "fr": "souris",
+   "year": "2000",
+   "tier": 1,
+   "d": "Dispositif de commande tenu à la main, connecté à un ordinateur, et dont le déplacement sur une surface entraîne le déplacement d'un repère sur…"
+  },
+  {
+   "en": "joystick",
+   "fr": "manche à balai",
+   "year": "2000",
+   "tier": 1,
+   "d": "Dispositif de commande à plusieurs degrés de liberté servant à déplacer le curseur d'un écran de visualisation."
+  },
+  {
+   "en": "frisbee",
+   "fr": "disque-volant",
+   "year": "2008",
+   "tier": 1,
+   "d": "Engin de jeu, de forme ronde et plate, conçu pour planer en tournant sur lui-même, auquel on donne plus ou moins d'effet lors du lancer."
+  },
+  {
+   "en": "leasing",
+   "fr": "crédit-bail",
+   "year": "2000",
+   "tier": 1,
+   "d": "Technique de crédit dans laquelle le prêteur offre à l'emprunteur la location d'un bien, assortie d'une promesse unilatérale de vente, qui peut se…"
+  },
+  {
+   "en": "e-learning",
+   "fr": "cyberformation",
+   "year": "2023",
+   "tier": 1,
+   "d": "Formation qui fait appel à des ressources et à des dispositifs pédagogiques accessibles dans un espace numérique, et qui peut notamment s’appuyer…"
+  },
+  {
+   "en": "online",
+   "fr": "en ligne",
+   "year": "2000",
+   "tier": 1,
+   "d": "Se dit d'un matériel lorsqu'il fonctionne en relation directe avec un autre."
+  },
+  {
+   "en": "playback",
+   "fr": "présonorisation",
+   "year": "2005",
+   "tier": 1,
+   "d": "Technique cinématographique ou de télévision qui consiste à enregistrer le son avant l'image afin que le ou les interprètes puissent mimer les…"
+  },
+  {
+   "en": "hit parade",
+   "fr": "palmarès",
+   "year": "2000",
+   "tier": 1,
+   "d": ""
+  },
+  {
+   "en": "post-it note",
+   "fr": "papillon",
+   "year": "2005",
+   "tier": 1,
+   "d": "Petit papier détachable à bande semi-adhésive."
+  },
+  {
+   "en": "flash mob",
+   "fr": "mobilisation éclair",
+   "year": "2010",
+   "tier": 1,
+   "d": "Rassemblement impromptu de personnes averties par minimessage ou par l'internet."
+  },
+  {
+   "en": "scoop",
+   "fr": "exclusivité",
+   "year": "2000",
+   "tier": 1,
+   "d": "Information importante ou à sensation donnée en exclusivité."
+  },
+  {
+   "en": "business angel",
+   "fr": "investisseur providentiel",
+   "year": "2007",
+   "tier": 2,
+   "d": "Investisseur privé qui apporte capital et savoir-faire à de jeunes entreprises innovantes sans rechercher de rendement immédiat, dans une…"
+  },
+  {
+   "en": "team building",
+   "fr": "renforcement d'équipe",
+   "year": "1998",
+   "tier": 2,
+   "d": ""
+  },
+  {
+   "en": "core business",
+   "fr": "cœur de métier",
+   "year": "2004",
+   "tier": 2,
+   "d": "Activité première d'une entreprise."
+  },
+  {
+   "en": "cash cow",
+   "fr": "vache à lait",
+   "year": "2010",
+   "tier": 2,
+   "d": "Produit, activité ou entreprise dégageant des profits élevés, le plus souvent grâce à une rente de situation."
+  },
+  {
+   "en": "game changer",
+   "fr": "tournant décisif",
+   "year": "2022",
+   "tier": 2,
+   "d": "Évènement ou élément nouveau qui marque un changement radical de situation."
+  },
+  {
+   "en": "short list",
+   "fr": "liste restreinte",
+   "year": "2004",
+   "tier": 2,
+   "d": "Liste des candidats retenus après une présélection."
+  },
+  {
+   "en": "check list",
+   "fr": "liste de vérification",
+   "year": "2000",
+   "tier": 2,
+   "d": "Document écrit servant d'aide-mémoire, indiquant dans l'ordre les différentes opérations ou vérifications à effectuer avant, pendant ou après la…"
+  },
+  {
+   "en": "success story",
+   "fr": "histoire d'une réussite",
+   "year": "2004",
+   "tier": 2,
+   "d": ""
+  },
+  {
+   "en": "soft skill",
+   "fr": "savoir-être professionnel",
+   "year": "2016",
+   "tier": 2,
+   "d": "Capacité d'un individu à adopter un comportement adapté à son milieu professionnel."
+  },
+  {
+   "en": "lean management",
+   "fr": "gestion au plus juste",
+   "year": "2014",
+   "tier": 2,
+   "d": "Méthode de management qui consiste à assurer la conduite d’une entreprise au coût le plus faible possible."
+  },
+  {
+   "en": "digital native",
+   "fr": "enfant du numérique",
+   "year": "2015",
+   "tier": 2,
+   "d": "Personne qui, ayant toujours vécu dans un environnement numérique, est présumée familière des outils et des usages des nouvelles techniques…"
+  },
+  {
+   "en": "big tech",
+   "fr": "géant du numérique",
+   "year": "2026",
+   "tier": 2,
+   "d": "Entreprise dont le modèle économique repose sur l’offre au public d’un service informatique et sur la collecte et l’exploitation des données des…"
+  },
+  {
+   "en": "dark net",
+   "fr": "internet clandestin",
+   "year": "2017",
+   "tier": 2,
+   "d": "Ensemble de réseaux conçus pour assurer l’anonymat des utilisateurs par la mise en œuvre d’une architecture décentralisée ainsi que de logiciels…"
+  },
+  {
+   "en": "zero-day",
+   "fr": "faille non corrigée",
+   "year": "2021",
+   "tier": 2,
+   "d": "Faille identifiée par des utilisateurs d’un système informatique, à laquelle il n’existe pas encore de parade."
+  },
+  {
+   "en": "bug bounty",
+   "fr": "prime à la faille détectée",
+   "year": "2020",
+   "tier": 2,
+   "d": "Rémunération octroyée par une organisation à un expert informatique indépendant qui découvre une faille de sécurité au sein d’un système…"
+  },
+  {
+   "en": "killer app",
+   "fr": "application phare",
+   "year": "2022",
+   "tier": 2,
+   "d": "Application informatique innovante dont la popularité est immédiate auprès des utilisateurs."
+  },
+  {
+   "en": "plug-and-play",
+   "fr": "prêt à l'emploi",
+   "year": "2007",
+   "tier": 2,
+   "d": "Se dit d'un équipement électronique utilisable dès sa connexion."
+  },
+  {
+   "en": "plugin",
+   "fr": "module complémentaire",
+   "year": "2026",
+   "tier": 2,
+   "d": "Composant logiciel qui ne peut être utilisé de manière autonome mais qui, une fois installé, apporte de nouvelles fonctionnalités à une ou…"
+  },
+  {
+   "en": "upgrade",
+   "fr": "mise à niveau",
+   "year": "2000",
+   "tier": 2,
+   "d": "Actualisation d'un logiciel ou d'un matériel."
+  },
+  {
+   "en": "browser",
+   "fr": "logiciel de navigation",
+   "year": "1999",
+   "tier": 2,
+   "d": "Dans un environnement de type internet, logiciel qui permet à l'utilisateur de rechercher et de consulter des documents et d'exploiter les liens…"
+  },
+  {
+   "en": "pop-up window",
+   "fr": "fenêtre intruse",
+   "year": "2005",
+   "tier": 2,
+   "d": "Fenêtre qui s'affiche soudainement à l'écran sans que l'utilisateur en ait fait la demande."
+  },
+  {
+   "en": "peer-to-peer",
+   "fr": "pair à pair",
+   "year": "2017",
+   "tier": 2,
+   "d": "Se dit du mode d’utilisation d’un réseau dans lequel chacun des participants connectés dispose des mêmes droits et qui permet un échange direct de…"
+  },
+  {
+   "en": "data mining",
+   "fr": "exploration de données",
+   "year": "2003",
+   "tier": 2,
+   "d": "Processus de recherche dans un ensemble de données destiné à détecter des corrélations cachées ou des informations nouvelles."
+  },
+  {
+   "en": "cloud gaming",
+   "fr": "jeu vidéo en nuage",
+   "year": "2022",
+   "tier": 2,
+   "d": "Technologie qui, grâce à l’informatique en nuage, permet de jouer à un jeu vidéo à distance sans téléchargement."
+  },
+  {
+   "en": "free-to-play",
+   "fr": "jeu vidéo en accès gratuit",
+   "year": "2022",
+   "tier": 2,
+   "d": "Jeu vidéo dont la version de base est gratuite mais qui peut comporter des fonctionnalités payantes."
+  },
+  {
+   "en": "gameplay",
+   "fr": "jouabilité",
+   "year": "2010",
+   "tier": 2,
+   "d": "Ensemble des possibilités d'action offertes au joueur par un jeu vidéo ;"
+  },
+  {
+   "en": "serious game",
+   "fr": "jeu sérieux",
+   "year": "2019",
+   "tier": 2,
+   "d": "Jeu vidéo conçu à des fins d’éducation, de formation, de communication ou d’information."
+  },
+  {
+   "en": "story-board",
+   "fr": "scénarimage",
+   "year": "2006",
+   "tier": 2,
+   "d": "Recueil de croquis correspondant au découpage du scénario d'un film, et présentant le contenu et le cadrage des différents plans de chacune des…"
+  },
+  {
+   "en": "blockbuster",
+   "fr": "grosse machine",
+   "year": "2006",
+   "tier": 2,
+   "d": "Production à gros budget, dont l'ambition semble surtout commerciale."
+  },
+  {
+   "en": "one-man show",
+   "fr": "spectacle solo",
+   "year": "2000",
+   "tier": 2,
+   "d": "Spectacle de variétés assuré par un artiste seul en scène."
+  },
+  {
+   "en": "breaking news",
+   "fr": "information de dernière minute",
+   "year": "2010",
+   "tier": 2,
+   "d": "Information dont l'importance justifie la diffusion ou la publication en urgence."
+  },
+  {
+   "en": "talking points",
+   "fr": "éléments de langage",
+   "year": "2025",
+   "tier": 2,
+   "d": "Formules ou ensemble d’arguments proposés à une personne sur les sujets qui pourront être abordés lors d’un entretien ou d’une communication…"
+  },
+  {
+   "en": "buzz marketing",
+   "fr": "bouche à oreille",
+   "year": "2007",
+   "tier": 2,
+   "d": "Technique mercatique fondée sur l'exploitation des messages circulant entre les consommateurs."
+  },
+  {
+   "en": "it-girl",
+   "fr": "icône de la mode",
+   "year": "2023",
+   "tier": 2,
+   "d": "Personne, le plus souvent jeune, dont l’allure et le style vestimentaire font référence."
+  },
+  {
+   "en": "top model",
+   "fr": "mannequin vedette",
+   "year": "2005",
+   "tier": 2,
+   "d": ""
+  },
+  {
+   "en": "must have",
+   "fr": "incontournable",
+   "year": "2023",
+   "tier": 2,
+   "d": "Vêtement ou accessoire que l’on se doit de posséder pour être à la mode."
+  },
+  {
+   "en": "mood board",
+   "fr": "planche de tendances",
+   "year": "2019",
+   "tier": 2,
+   "d": "Assemblage d’éléments tels que des images, des objets, des échantillons, des mots, qui sert de support d’inspiration pour concevoir un univers…"
+  },
+  {
+   "en": "skate park",
+   "fr": "planchodrome",
+   "year": "2023",
+   "tier": 2,
+   "d": "Site aménagé pour la pratique de la planche à roulettes ;"
+  },
+  {
+   "en": "trail running",
+   "fr": "course de pleine nature",
+   "year": "2010",
+   "tier": 2,
+   "d": "Course d'endurance en terrain naturel et varié, dans laquelle les concurrents enchaînent des difficultés pouvant imposer une alternance de marche…"
+  },
+  {
+   "en": "base jump",
+   "fr": "saut extrême",
+   "year": "2010",
+   "tier": 2,
+   "d": "Pratique extrême de parachutisme consistant à s'élancer en chute libre, du haut d'une paroi, d'un édifice ou d'un ouvrage d'art."
+  },
+  {
+   "en": "wing suit",
+   "fr": "combinaison ailée",
+   "year": "2010",
+   "tier": 2,
+   "d": "Combinaison à voiles souples intégrées qui permet à un parachutiste de planer avant d'ouvrir son parachute ;"
+  },
+  {
+   "en": "dunk",
+   "fr": "panier smashé",
+   "year": "2011",
+   "tier": 2,
+   "d": "Tir réussi par un joueur qui saute et rabat le ballon à l'intérieur du panier d'une forte claque."
+  },
+  {
+   "en": "pace maker",
+   "fr": "lièvre",
+   "year": "2010",
+   "tier": 2,
+   "d": "Athlète qui prend momentanément la tête d'une course en peloton et lui imprime un train soutenu, de manière à favoriser un ou plusieurs concurrents."
+  },
+  {
+   "en": "starting block",
+   "fr": "bloc de départ",
+   "year": "2000",
+   "tier": 2,
+   "d": "Instrument fixé au sol sur lequel le coureur cale ses pieds au départ, et destiné à lui assurer une meilleure propulsion lors de l'élan initial."
+  },
+  {
+   "en": "drop shipping",
+   "fr": "vente en ligne sans stock",
+   "year": "2023",
+   "tier": 2,
+   "d": "Pratique commerciale qui consiste, pour un distributeur en ligne, à déléguer entièrement à des tiers la logistique, notamment le stockage et la…"
+  },
+  {
+   "en": "dark store",
+   "fr": "entrepôt relais",
+   "year": "2023",
+   "tier": 2,
+   "d": "Entrepôt secondaire d’une entreprise de vente en ligne, qui est implanté près des clients potentiels et dont les rayons sont disposés comme ceux…"
+  },
+  {
+   "en": "cash back",
+   "fr": "remise différée",
+   "year": "2011",
+   "tier": 2,
+   "d": "Remise proposée à un client sur un achat ultérieur."
+  },
+  {
+   "en": "self check-out",
+   "fr": "caisse en libre service",
+   "year": "2014",
+   "tier": 2,
+   "d": "Caisse qui permet à un client d’enregistrer ses achats et d’en effectuer le paiement lui-même."
+  },
+  {
+   "en": "duty-free shop",
+   "fr": "boutique hors taxes",
+   "year": "2000",
+   "tier": 2,
+   "d": "Boutique où sont proposées à la vente des marchandises qui ne sont pas soumises au paiement de taxes."
+  },
+  {
+   "en": "road show",
+   "fr": "tournée de présentation",
+   "year": "2008",
+   "tier": 2,
+   "d": "Tournée promotionnelle organisée de place en place par une entreprise qui souhaite présenter ses projets aux investisseurs et à la presse."
+  },
+  {
+   "en": "kick-off meeting",
+   "fr": "réunion de démarrage",
+   "year": "2009",
+   "tier": 2,
+   "d": "Réunion de travail rassemblant les parties concernées et marquant le lancement effectif d'une activité."
+  },
+  {
+   "en": "mind map",
+   "fr": "carte heuristique",
+   "year": "2021",
+   "tier": 2,
+   "d": "Représentation graphique d’informations, de connaissances et d’idées, qui sont organisées en arborescences autour d’un thème central afin de…"
+  },
+  {
+   "en": "flash card",
+   "fr": "carte-éclair",
+   "year": "2014",
+   "tier": 2,
+   "d": "Support pédagogique imprimé ou numérique, se présentant sous forme de fiche, qui permet l’acquisition de connaissances et de compétences et sa…"
+  },
+  {
+   "en": "smart money",
+   "fr": "argent futé",
+   "year": "2004",
+   "tier": 2,
+   "d": "Réserve d'argent pour investissement propice."
+  },
+  {
+   "en": "seed money",
+   "fr": "fonds d'amorçage",
+   "year": "2011",
+   "tier": 2,
+   "d": "Fonds alloués, le plus souvent par des investisseurs providentiels, au lancement d'un projet pour permettre la prospection de marchés et le…"
+  },
+  {
+   "en": "scale up",
+   "fr": "gazelle",
+   "year": "2022",
+   "tier": 2,
+   "d": "Jeune pousse dont la croissance soutenue pendant plusieurs exercices atteste l’extensibilité du modèle économique."
+  },
+  {
+   "en": "junk bond",
+   "fr": "obligation à haut risque",
+   "year": "2000",
+   "tier": 2,
+   "d": "Obligation émise par une entreprise privée n'ayant pas demandé de notation ou n'ayant obtenu qu'une mauvaise notation de son émission."
+  },
+  {
+   "en": "green bond",
+   "fr": "obligation verte",
+   "year": "2023",
+   "tier": 2,
+   "d": "Obligation émise par une entité publique ou privée pour financer un projet qui a un effet positif sur l’environnement."
+  },
+  {
+   "en": "flash crash",
+   "fr": "krach éclair",
+   "year": "2018",
+   "tier": 2,
+   "d": "Chute forte et extrêmement rapide des cours boursiers."
+  },
+  {
+   "en": "day trader",
+   "fr": "opérateur à la journée",
+   "year": "2008",
+   "tier": 2,
+   "d": "Opérateur qui prend et dénoue ses positions dans la même journée."
+  },
+  {
+   "en": "offshore",
+   "fr": "extraterritorial",
+   "year": "2000",
+   "tier": 2,
+   "d": "Qualifie les activités bancaires et financières domiciliées dans les places étrangères."
+  },
+  {
+   "en": "clean tech",
+   "fr": "écotechnologie",
+   "year": "2010",
+   "tier": 2,
+   "d": "Ensemble des procédés industriels qui visent à prévenir ou réduire les effets négatifs sur l'environnement des produits à chaque stade de leur…"
+  },
+  {
+   "en": "wind farm",
+   "fr": "parc éolien",
+   "year": "2023",
+   "tier": 2,
+   "d": "Site terrestre ou marin regroupant plusieurs éoliennes qui transforment l’énergie cinétique du vent en énergie électrique."
+  },
+  {
+   "en": "hot spot",
+   "fr": "zone d'accès sans fil",
+   "year": "2005",
+   "tier": 2,
+   "d": "Espace où le public bénéficie de services radioélectriques temporaires ou permanents à haut débit, notamment d'un accès sans fil à l'internet."
+  },
+  {
+   "en": "at-sign",
+   "fr": "arrobe",
+   "year": "2002",
+   "tier": 2,
+   "d": "Caractère @ fréquemment employé dans les adresses de courrier électronique pour séparer le nom identifiant l'utilisateur de celui du gestionnaire…"
+  },
+  {
+   "en": "e-book reader",
+   "fr": "liseuse",
+   "year": "2012",
+   "tier": 2,
+   "d": "Appareil portable doté d'un écran et destiné au stockage et à la lecture des livres numériques ou des périodiques."
+  },
+  {
+   "en": "flip book",
+   "fr": "folioscope",
+   "year": "2019",
+   "tier": 2,
+   "d": "Petit livre qui, lorsqu’il est feuilleté rapidement à un rythme régulier, permet de voir une succession d’images créant l’illusion d’une séquence…"
+  },
+  {
+   "en": "lip dub",
+   "fr": "mimoclip",
+   "year": "2011",
+   "tier": 2,
+   "d": "Interprétation mimée, sur un vidéogramme, d'une bande-son préexistante ;"
+  },
+  {
+   "en": "mash-up",
+   "fr": "collage",
+   "year": "2010",
+   "tier": 2,
+   "d": "Assemblage, au moyen d'outils numériques, d'éléments visuels ou sonores provenant de différentes sources."
+  },
+  {
+   "en": "fan edit",
+   "fr": "montage sauvage",
+   "year": "2007",
+   "tier": 2,
+   "d": "Version d'une œuvre audiovisuelle ou musicale tronquée ou modifiée par des admirateurs, à l'insu de ses auteurs."
+  },
+  {
+   "en": "trash television",
+   "fr": "télé-poubelle",
+   "year": "2010",
+   "tier": 2,
+   "d": "Programme télévisé vulgaire, racoleur et dégradant."
+  },
+  {
+   "en": "bore-out",
+   "fr": "ennui professionnel",
+   "year": "2023",
+   "tier": 2,
+   "d": "Perte d’intérêt professionnel qui est provoquée chez une personne par une quantité de travail insuffisante ou par l’accomplissement de tâches…"
+  },
+  {
+   "en": "brown-out",
+   "fr": "perte de sens professionnelle",
+   "year": "2023",
+   "tier": 2,
+   "d": "Perte d’intérêt professionnel qui est provoquée chez une personne par l’incompréhension de la finalité de son travail, voire par le sentiment de…"
+  },
+  {
+   "en": "solo wheel",
+   "fr": "gyroroue",
+   "year": "2021",
+   "tier": 2,
+   "d": "Engin léger de déplacement personnel à moteur électrique, qui est constitué d’une roue autostabilisée par effet gyroscopique et placée entre deux…"
+  },
+  {
+   "en": "bmx",
+   "fr": "bicross",
+   "year": "2025",
+   "tier": 2,
+   "d": "Vélo équipé de petites roues et dépourvu de dérailleur, qui est conçu pour la vitesse et l’acrobatie ;"
+  },
+  {
+   "en": "walking bus",
+   "fr": "pédibus",
+   "year": "2020",
+   "tier": 2,
+   "d": "Mode de déplacement collectif à pied d’enfants qui sont conduits par des adultes sur un trajet et selon un horaire de passage déterminés."
+  },
+  {
+   "en": "steward",
+   "fr": "stadiaire",
+   "year": "1997",
+   "tier": 2,
+   "d": "Agent exerçant auprès du public d'un stade les fonctions d'accueil, d'assistance, de contrôle et de sécurité."
+  },
+  {
+   "en": "clean sheet",
+   "fr": "cage inviolée",
+   "year": "2020",
+   "tier": 2,
+   "d": "Fait, pour une équipe ou un gardien, qu’aucun but n’ait été marqué contre eux au cours d’un match ou d’une série de matchs."
+  },
+  {
+   "en": "deep state",
+   "fr": "État profond",
+   "year": "2022",
+   "tier": 2,
+   "d": "Ensemble de personnes, généralement soutenues par des groupes d’intérêt, dont on suppose que les rôles clés au sein de l’État leur permettent…"
+  },
+  {
+   "en": "swing state",
+   "fr": "État-charnière",
+   "year": "2012",
+   "tier": 2,
+   "d": "État des États-Unis qui peut alterner, d'un scrutin à l'autre, entre les deux partis dominants et faire basculer le résultat du vote final."
+  },
+  {
+   "en": "black bloc",
+   "fr": "cagoules noires",
+   "year": "2020",
+   "tier": 2,
+   "d": "Groupe d’individus cagoulés et vêtus de noir qui recourt, à la faveur de manifestations sur la voie publique, à des actions violentes concertées,…"
+  },
+  {
+   "en": "cosplay",
+   "fr": "costumade",
+   "year": "2011",
+   "tier": 2,
+   "d": "Rassemblement costumé d'amateurs ayant endossé l'apparence de leurs personnages favoris, empruntés à la bande dessinée, au manga, au cinéma et aux…"
+  },
+  {
+   "en": "edge computing",
+   "fr": "informatique en périphérie",
+   "year": "2021",
+   "tier": 2,
+   "d": "Traitement des données qui s’effectue en périphérie d’un réseau de télécommunication, au moyen d’un dispositif proche de la source de ces données…"
+  },
+  {
+   "en": "data lake",
+   "fr": "lac de données",
+   "year": "2023",
+   "tier": 2,
+   "d": "Infrastructure logicielle qui collecte des mégadonnées dans leur format d’origine, généralement en continu, et les associe automatiquement à des…"
+  },
+  {
+   "en": "cost killer",
+   "fr": "chasseur de coûts",
+   "year": "2004",
+   "tier": 2,
+   "d": "Personne chargée de traquer toutes les dépenses superflues."
+  },
+  {
+   "en": "golden hello",
+   "fr": "pont d'or",
+   "year": "2010",
+   "tier": 2,
+   "d": "Avantage exceptionnel proposé à une personne pour l'inciter à rejoindre une entreprise."
+  },
+  {
+   "en": "firmware",
+   "fr": "microprogramme",
+   "year": "2000",
+   "tier": 3,
+   "d": ""
+  },
+  {
+   "en": "random-access memory",
+   "fr": "mémoire vive",
+   "year": "2000",
+   "tier": 3,
+   "d": "Mémoire dont le contenu peut être modifié en usage normal."
+  },
+  {
+   "en": "read-only memory",
+   "fr": "mémoire morte",
+   "year": "2000",
+   "tier": 3,
+   "d": "Mémoire dont le contenu ne peut être modifié en usage normal."
+  },
+  {
+   "en": "cache memory",
+   "fr": "antémémoire",
+   "year": "2007",
+   "tier": 3,
+   "d": "Mémoire très rapide, intercalée entre le processeur et la mémoire principale, que l'ordinateur consulte avant d'interroger la mémoire principale…"
+  },
+  {
+   "en": "page turner",
+   "fr": "accrolivre",
+   "year": "2019",
+   "tier": 3,
+   "d": "Livre à ce point captivant qu’on le lit d’une traite."
+  },
+  {
+   "en": "chick lit",
+   "fr": "romance urbaine",
+   "year": "2020",
+   "tier": 3,
+   "d": "Catégorie de roman qui met en scène avec humour et dérision une jeune citadine d’aujourd’hui."
+  },
+  {
+   "en": "cosy crime",
+   "fr": "roman policier léger",
+   "year": "2023",
+   "tier": 3,
+   "d": "Catégorie de roman policier dont l’intrigue, traitée avec humour et légèreté, procure une lecture divertissante."
+  },
+  {
+   "en": "book trailer",
+   "fr": "bande-annonce de livre",
+   "year": "2019",
+   "tier": 3,
+   "d": "Document audiovisuel conçu pour promouvoir un livre."
+  },
+  {
+   "en": "extended play",
+   "fr": "minialbum",
+   "year": "2020",
+   "tier": 3,
+   "d": "Album musical qui présente au maximum six titres et moins de trente minutes de musique enregistrée."
+  },
+  {
+   "en": "video jockey",
+   "fr": "imagiste",
+   "year": "2006",
+   "tier": 3,
+   "d": "Personne qui combine des éléments visuels provenant de différentes sources, en particulier d'œuvres cinématographiques et de vidéogrammes, en vue…"
+  },
+  {
+   "en": "bus shelter",
+   "fr": "aubette",
+   "year": "2000",
+   "tier": 3,
+   "d": "Abri aménagé aux points de départ ou d'arrêt d'un moyen de transport en commun."
+  },
+  {
+   "en": "skipper",
+   "fr": "chef de bord",
+   "year": "2007",
+   "tier": 3,
+   "d": "Personne responsable du pilotage d'un navire."
+  },
+  {
+   "en": "fiscal cliff",
+   "fr": "couperet budgétaire",
+   "year": "2015",
+   "tier": 3,
+   "d": "Arrivée à échéance de dispositifs fiscaux ou budgétaires qui entraîne l'application automatique de mesures de restriction."
+  },
+  {
+   "en": "sharp power",
+   "fr": "pouvoir de manipulation",
+   "year": "2022",
+   "tier": 3,
+   "d": "Capacité d’un État à manipuler les opinions publiques d’autres États, notamment par l’usage d’infox."
+  },
+  {
+   "en": "civic tech",
+   "fr": "technologie civique",
+   "year": "2019",
+   "tier": 3,
+   "d": "Ensemble d’outils numériques conçus pour renforcer la compréhension des institutions par les citoyens et leur participation à la vie démocratique."
+  },
+  {
+   "en": "open banking",
+   "fr": "banque ouverte",
+   "year": "2026",
+   "tier": 3,
+   "d": "Disposition qui permet au client d’une banque d’autoriser des prestataires de services financiers à accéder à ses données bancaires par…"
+  },
+  {
+   "en": "copy trading",
+   "fr": "négoce mimétique",
+   "year": "2026",
+   "tier": 3,
+   "d": "Stratégie de négoce qui consiste à calquer, notamment grâce à des plateformes spécialisées, ses ordres d’achat et de vente sur ceux d’une personne…"
+  },
+  {
+   "en": "social trading",
+   "fr": "négoce communautaire",
+   "year": "2026",
+   "tier": 3,
+   "d": "Négoce recourant à une application qui permet aux utilisateurs d’échanger leurs avis."
+  },
+  {
+   "en": "crypto asset",
+   "fr": "cyberjeton",
+   "year": "2021",
+   "tier": 3,
+   "d": "Actif numérique émis et attribué ou transféré au moyen d’un dispositif d’enregistrement électronique partagé à un participant à ce dispositif."
+  },
+  {
+   "en": "proof of work",
+   "fr": "preuve de travail",
+   "year": "2017",
+   "tier": 3,
+   "d": "Résultat d’une tâche fortement consommatrice de ressources de calcul, dont l’exactitude est facilement vérifiable par tout participant et atteste…"
+  },
+  {
+   "en": "love money",
+   "fr": "argent du cœur",
+   "year": "2004",
+   "tier": 3,
+   "d": "Soutien financier apporté pour des raisons affectives ou familiales."
+  },
+  {
+   "en": "family office",
+   "fr": "gestionnaire de grande fortune",
+   "year": "2012",
+   "tier": 3,
+   "d": "Organisme spécialisé dans la gestion administrative et financière de patrimoines importants."
+  },
+  {
+   "en": "bad bank",
+   "fr": "structure de défaisance",
+   "year": "2022",
+   "tier": 3,
+   "d": "Entité ad hoc créée pour recueillir et gérer des actifs de mauvaise qualité cédés par une institution qui cherche ainsi à améliorer son bilan."
+  },
+  {
+   "en": "private equity",
+   "fr": "investissement en capital",
+   "year": "2013",
+   "tier": 3,
+   "d": "Activité consistant à investir dans des entreprises non cotées en Bourse."
+  },
+  {
+   "en": "trust",
+   "fr": "fiducie",
+   "year": "2000",
+   "tier": 3,
+   "d": "Contrat par lequel un constituant transfère temporairement la propriété de biens ou de droits à un fiduciaire, à charge pour ce dernier d'agir…"
+  },
+  {
+   "en": "broker",
+   "fr": "courtier",
+   "year": "2001",
+   "tier": 3,
+   "d": "Intermédiaire qui agit sur les marchés financiers pour le compte de tiers."
+  },
+  {
+   "en": "pocket bike",
+   "fr": "minimoto",
+   "year": "2009",
+   "tier": 3,
+   "d": "Moto de taille réduite, utilisée à des fins ludiques ou sportives."
+  },
+  {
+   "en": "gravel bike",
+   "fr": "vélo de gravier",
+   "year": "2025",
+   "tier": 3,
+   "d": "Vélo qui combine le cadre du vélo de route avec des pneus larges et crantés ;"
+  },
+  {
+   "en": "rss feed",
+   "fr": "flux de dépêches",
+   "year": "2013",
+   "tier": 3,
+   "d": "Suite de données générées automatiquement par un site de la toile pour permettre l'accès aux nouveautés de ce site."
+  },
+  {
+   "en": "eye tracking",
+   "fr": "oculométrie",
+   "year": "2016",
+   "tier": 3,
+   "d": "Ensemble des techniques d’enregistrement et d’analyse des mouvements oculaires."
+  },
+  {
+   "en": "text-to-speech",
+   "fr": "synthèse vocale de texte",
+   "year": "2019",
+   "tier": 3,
+   "d": "Conversion automatique d’un texte en un énoncé oral, qui recourt notamment aux techniques de traitement automatique des langues naturelles et de…"
+  },
+  {
+   "en": "splash screen",
+   "fr": "fenêtre d'attente",
+   "year": "2005",
+   "tier": 3,
+   "d": "Fenêtre qui s'affiche provisoirement sur un écran pendant l'installation d'un logiciel."
+  },
+  {
+   "en": "hidden web",
+   "fr": "toile profonde",
+   "year": "2017",
+   "tier": 3,
+   "d": "Partie de la toile qui n’est pas accessible aux internautes au moyen des moteurs de recherche usuels."
+  },
+  {
+   "en": "office automation",
+   "fr": "bureautique",
+   "year": "2000",
+   "tier": 3,
+   "d": "Ensemble des techniques et des moyens tendant à automatiser les activités de bureau et principalement le traitement et la communication de la…"
+  },
+  {
+   "en": "bundle",
+   "fr": "offre groupée",
+   "year": "2009",
+   "tier": 3,
+   "d": ""
+  },
+  {
+   "en": "knowledge management",
+   "fr": "gestion du savoir",
+   "year": "2001",
+   "tier": 3,
+   "d": "Gestion du capital intellectuel de l'entreprise, actif immatériel constitué par l'ensemble des connaissances et du savoir-faire des salariés."
+  },
+  {
+   "en": "green tax",
+   "fr": "écotaxe",
+   "year": "2011",
+   "tier": 3,
+   "d": "Prélèvement fiscal opéré sur un bien, un service ou une activité en raison des dommages qu'ils sont susceptibles d'occasionner à l'environnement."
+  },
+  {
+   "en": "dos attack",
+   "fr": "attaque par interruption de service",
+   "year": "2022",
+   "tier": 3,
+   "d": "Action malveillante qui vise à rendre indisponibles pendant un temps indéterminé un ou plusieurs services informatiques ou de télécommunication…"
+  },
+  {
+   "en": "tracker",
+   "fr": "fonds indiciel coté",
+   "year": "2018",
+   "tier": 3,
+   "d": "Fonds coté sur un marché, dont l’objet est de reproduire l’évolution de la valeur d’un panier d’actifs, que celui-ci soit composé de matières…"
+  },
+  {
+   "en": "penny stock",
+   "fr": "valeur à quatre sous",
+   "year": "2012",
+   "tier": 3,
+   "d": "Action hautement spéculative et dont le cours est très bas."
+  },
+  {
+   "en": "golden share",
+   "fr": "action en or",
+   "year": "2011",
+   "tier": 3,
+   "d": "Action réservée à certains investisseurs, en particulier l'État, et assortie d'un droit de veto."
+  },
+  {
+   "en": "chinese wall",
+   "fr": "cloison étanche",
+   "year": "2014",
+   "tier": 3,
+   "d": "Séparation rigoureuse des différentes fonctions exercées dans un établissement financier, telles que la gestion de portefeuilles, l’analyse…"
+  },
+  {
+   "en": "fact book",
+   "fr": "descriptif",
+   "year": "2013",
+   "tier": 3,
+   "d": "Fiche d'information portant sur un sujet donné."
+  },
+  {
+   "en": "hand-out",
+   "fr": "document d’accompagnement",
+   "year": "2021",
+   "tier": 3,
+   "d": "Document imprimé qui est mis à la disposition d’un auditoire et qui accompagne un exposé, un cours ou une présentation."
+  },
+  {
+   "en": "trade show",
+   "fr": "salon professionnel",
+   "year": "2000",
+   "tier": 3,
+   "d": ""
+  },
+  {
+   "en": "soft landing",
+   "fr": "atterrissage en douceur",
+   "year": "2001",
+   "tier": 3,
+   "d": "Récession maîtrisée et progressive."
+  },
+  {
+   "en": "lay-off",
+   "fr": "chômage temporaire",
+   "year": "1998",
+   "tier": 3,
+   "d": "Situation créée par un licenciement, en général collectif, effectué par une entreprise en difficulté conjoncturelle, avec promesse de réembauche…"
+  },
+  {
+   "en": "policy mix",
+   "fr": "dosage macroéconomique",
+   "year": "2000",
+   "tier": 3,
+   "d": "Arbitrage effectué par les pouvoirs publics entre les instruments budgétaire et monétaire, en vue d'assurer le meilleur équilibre entre croissance…"
+  },
+  {
+   "en": "exit tax",
+   "fr": "taxe d'expatriation",
+   "year": "2012",
+   "tier": 3,
+   "d": "Impôt compensatoire auquel peuvent être soumises les plus-values latentes constatées sur le patrimoine mobilier d'un contribuable qui transfère…"
+  },
+  {
+   "en": "patent box",
+   "fr": "régime privilégié des brevets",
+   "year": "2017",
+   "tier": 3,
+   "d": "Régime fiscal particulièrement favorable aux produits de la cession ou de la concession de brevets et d’autres droits de propriété intellectuelle."
+  },
+  {
+   "en": "ghost kitchen",
+   "fr": "traiteur tout en ligne",
+   "year": "2024",
+   "tier": 3,
+   "d": "Entreprise de restauration qui prépare des plats exclusivement destinés à la livraison de commandes passées en ligne ou par téléphone."
+  },
+  {
+   "en": "me-too",
+   "fr": "suiveur",
+   "year": "2000",
+   "tier": 3,
+   "d": "Personne ou entreprise qui imite un produit, une technique, un service considérés comme dominants sur le marché."
+  },
+  {
+   "en": "early bird",
+   "fr": "prime à la réponse",
+   "year": "2004",
+   "tier": 3,
+   "d": "Technique de promotion des ventes consistant à offrir un avantage au consommateur s'il achète dans un court délai."
+  },
+  {
+   "en": "give-away",
+   "fr": "cadeau publicitaire",
+   "year": "2000",
+   "tier": 3,
+   "d": "Objet de faible valeur distribué gratuitement pour promouvoir un produit ou une entreprise."
+  },
+  {
+   "en": "long tail",
+   "fr": "longue traîne",
+   "year": "2010",
+   "tier": 3,
+   "d": "Modèle économique dans lequel la vente, même en faible quantité, de produits culturels ou d'œuvres destinés à un public réduit ou dispersé devient…"
+  },
+  {
+   "en": "time-to-market",
+   "fr": "délai de lancement",
+   "year": "2006",
+   "tier": 3,
+   "d": "Temps écoulé entre la décision de s'implanter sur un marché et la mise en vente effective d'un produit."
+  },
+  {
+   "en": "close-up",
+   "fr": "gros plan",
+   "year": "2000",
+   "tier": 3,
+   "d": "Plan isolant un détail du corps ;"
+  },
+  {
+   "en": "voice-over",
+   "fr": "voix hors champ",
+   "year": "2000",
+   "tier": 3,
+   "d": "Voix d'une personne absente à l'écran."
+  },
+  {
+   "en": "casting",
+   "fr": "audition",
+   "year": "2005",
+   "tier": 3,
+   "d": "Mode de sélection des artistes susceptibles de tenir les rôles d'un film, d'une pièce de théâtre ou d'un programme."
+  }
+ ],
+ "bosses": [
+  {
+   "en": "cloud computing",
+   "fr": "informatique en nuage",
+   "year": "2010",
+   "decoys": [
+    "informatique nuageuse",
+    "nuage informatique"
+   ],
+   "d": "Mode de traitement des données d'un client, dont l'exploitation s'effectue par l'internet, sous la forme de services fournis par un prestataire."
+  },
+  {
+   "en": "crowdfunding",
+   "fr": "financement participatif",
+   "year": "2013",
+   "decoys": [
+    "financement collaboratif",
+    "financement par la foule"
+   ],
+   "d": "Financement faisant appel à un grand nombre de personnes, généralement des internautes, pour qu'elles investissent les fonds nécessaires à…"
+  },
+  {
+   "en": "brainstorming",
+   "fr": "remue-méninges",
+   "year": "2000",
+   "decoys": [
+    "tempête de cerveaux",
+    "remue-cervelles"
+   ],
+   "d": "Technique de groupe destinée à stimuler l'imagination des participants en vue de leur faire produire le maximum d'idées dans le minimum de temps."
+  },
+  {
+   "en": "deep learning",
+   "fr": "apprentissage profond",
+   "year": "2018",
+   "decoys": [
+    "apprentissage approfondi",
+    "savoir profond"
+   ],
+   "d": "Apprentissage automatique qui utilise un réseau de neurones artificiels composé d’un grand nombre de couches dont chacune correspond à un niveau…"
+  },
+  {
+   "en": "software as a service",
+   "fr": "logiciel à la demande",
+   "year": "2013",
+   "decoys": [
+    "logiciel en service",
+    "service logiciel en ligne"
+   ],
+   "d": "Prestation de service proposant à un client l'utilisation à distance d'un logiciel et dont le coût correspond à son usage effectif."
+  },
+  {
+   "en": "social engineering",
+   "fr": "manipulation psychosociale",
+   "year": "2021",
+   "decoys": [
+    "ingénierie sociale",
+    "manipulation sociale"
+   ],
+   "d": "Ensemble de techniques frauduleuses qui permettent, en exploitant la confiance ou la crédulité d’une personne, choisie en fonction de…"
+  },
+  {
+   "en": "burnout",
+   "fr": "syndrome d'épuisement professionnel",
+   "year": "2012",
+   "decoys": [
+    "syndrome de l'épuisement au travail",
+    "épuisement professionnel aigu"
+   ],
+   "d": "Syndrome caractérisé par un état de fatigue extrême, tant physique que mentale, attribué à la profession exercée et aux conditions de son exercice."
+  },
+  {
+   "en": "binge watching",
+   "fr": "visionnage boulimique",
+   "year": "2017",
+   "decoys": [
+    "visionnage compulsif",
+    "gavage télévisuel"
+   ],
+   "d": "Pratique qui consiste à regarder à la suite un très grand nombre de contenus audiovisuels, notamment les épisodes d’une même série télévisée."
+  },
+  {
+   "en": "first person shooter",
+   "fr": "jeu de tir en vue subjective",
+   "year": "2017",
+   "decoys": [
+    "jeu de tir à la première personne",
+    "jeu de tir en vue intérieure"
+   ],
+   "d": "Jeu de tir dans lequel le joueur voit ce que le personnage qu’il contrôle est censé voir."
+  },
+  {
+   "en": "speech-to-text",
+   "fr": "transcription automatique de la parole",
+   "year": "2019",
+   "decoys": [
+    "transcription vocale automatique",
+    "conversion parole-texte"
+   ],
+   "d": "Conversion automatique d’un énoncé oral en texte, qui recourt notamment aux techniques de traitement du signal et de traitement automatique des…"
+  },
+  {
+   "en": "business intelligence",
+   "fr": "veille économique",
+   "year": "1998",
+   "decoys": [
+    "intelligence d'affaires",
+    "renseignement d'entreprise"
+   ],
+   "d": "Recherche, traitement et diffusion (en vue de leur exploitation) de renseignements utiles à l'entreprise."
+  },
+  {
+   "en": "game as a service",
+   "fr": "jeu vidéo à la demande",
+   "year": "2022",
+   "decoys": [
+    "jeu vidéo en service",
+    "jeu en abonnement"
+   ],
+   "d": "Offre commerciale qui propose l’utilisation d’un jeu vidéo en nuage, facturée pour un usage ponctuel ou, plus souvent, liée à un abonnement."
+  },
+  {
+   "en": "not in my back yard",
+   "fr": "non au projet ici",
+   "year": "2023",
+   "decoys": [
+    "pas dans mon jardin",
+    "pas chez moi, merci"
+   ],
+   "d": ""
+  },
+  {
+   "en": "intelligent speed adaptation",
+   "fr": "installation de surveillance d'allure",
+   "year": "2004",
+   "decoys": [
+    "adaptation intelligente de vitesse",
+    "régulateur d'allure intelligent"
+   ],
+   "d": "Système faisant appel à un équipement externe qui, en cas de dépassement d'une vitesse limite, adresse un signal au conducteur ou commande…"
+  },
+  {
+   "en": "fat bike",
+   "fr": "vélo à pneus surdimensionnés",
+   "year": "2020",
+   "decoys": [
+    "vélo à gros pneus",
+    "vélo à pneus larges"
+   ],
+   "d": "Vélo tout-terrain muni de pneus très larges équipés de crampons, qui améliorent l’adhérence sur des terrains meubles ou glissants ;"
+  },
+  {
+   "en": "auto-tune",
+   "fr": "ajustement automatique d'intonation",
+   "year": "2020",
+   "decoys": [
+    "correcteur de justesse automatique",
+    "accordage vocal automatique"
+   ],
+   "d": "Procédé sonore numérique qui permet, lors d’une séance d’enregistrement ou d’un concert, d’aligner la fréquence d’une voix sur une hauteur…"
+  },
+  {
+   "en": "open source software",
+   "fr": "logiciel libre",
+   "year": "2007",
+   "decoys": [
+    "logiciel ouvert",
+    "logiciel à source ouverte"
+   ],
+   "d": "Logiciel distribué avec l'intégralité de ses programmes-sources, afin que l'ensemble des utilisateurs qui l'emploient, puissent l'enrichir et le…"
+  },
+  {
+   "en": "e-sport",
+   "fr": "jeu vidéo de compétition",
+   "year": "2022",
+   "decoys": [
+    "sport électronique",
+    "compétition vidéoludique"
+   ],
+   "d": "Pratique compétitive, généralement professionnelle, du jeu vidéo qui est organisée dans le cadre de ligues nationales ou de championnats…"
+  }
+ ]
+}
