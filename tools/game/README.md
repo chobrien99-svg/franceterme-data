@@ -13,9 +13,13 @@ A playful arcade game built on the FranceTerme database (termes recommandés au 
 ## Embedding in Ghost
 Add an HTML card:
 
-    <iframe src="https://YOUR-VERCEL-URL/game"
-      style="width:100%;height:820px;border:0;border-radius:12px"
-      allow="microphone; autoplay" loading="lazy"
+    <iframe src="https://franceterme-data.vercel.app/game"
+      style="width:100%;height:min(820px,85vh);min-height:520px;border:0;border-radius:12px"
+      allow="microphone; autoplay; fullscreen" allowfullscreen loading="lazy"
       title="Opération La Défense"></iframe>
+
+The height adapts to the reader's screen (85% of the window, never taller than 820px),
+so the whole game fits without zooming out. `fullscreen` lets the "⛶ Plein écran" button
+enlarge the game; if an embed doesn't allow it, the button opens the game in a new tab instead.
 
 Voice mode works best in Chrome. Data: Licence Ouverte, ministère de la Culture.
