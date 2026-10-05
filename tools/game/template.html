@@ -191,6 +191,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--brass-hi);outli
     <div id="controls">
       <button class="toggle" id="voiceBtn" aria-pressed="false">🎙️ Mode Académicien (voix)</button>
       <button class="toggle" id="soundBtn" aria-pressed="true">🔊 Son et voix</button>
+      <button class="toggle" id="musicBtn" aria-pressed="true">🎵 Musique</button>
     </div>
   </div>
 
@@ -323,10 +324,91 @@ function say(text, {prof=false, onend}={}){
   try{
     const u = new SpeechSynthesisUtterance(text); u.lang="fr-FR"; if(frVoice) u.voice=frVoice;
     u.rate = prof ? 1.02 : .95; u.pitch = prof ? .75 : 1;
-    if(onend) u.onend = onend;
+    u.onstart = () => duck(true);
+    u.onend = () => { duck(false); onend && onend(); };
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   }catch(e){ onend && onend(); }
 }
+
+/* ======================= Music (chiptune, synthesized live, no audio files) ======================= */
+const NOTE_I={C:0,"C#":1,D:2,"D#":3,E:4,F:5,"F#":6,G:7,"G#":8,A:9,"A#":10,B:11};
+const hz = n => { const m=n.match(/^([A-G]#?)(\d)$/); return 440*Math.pow(2,(NOTE_I[m[1]]+(+m[2]+1)*12-69)/12); };
+function seq(str, inst, vol, start=0){ let t=start; const out=[];
+  for(const tok of str.trim().split(/\s+/)){ const [n,d]=tok.split(":"); if(n!=="-") out.push({t,d:+d,f:hz(n),i:inst,v:vol}); t+=+d; } return out; }
+const CH = {C:["C3",["E4","G4"]],G7:["G2",["F4","B4"]],G:["G2",["B3","D4"]],Dm:["D3",["F4","A4"]],F:["F2",["A3","C4"]],Am:["A2",["C4","E4"]],E:["E2",["G#3","B3"]]};
+function waltzBacking(chords){ const ev=[]; chords.forEach((c,bar)=>{ const [root,tones]=CH[c]; const b=bar*3;
+  ev.push({t:b,d:.9,f:hz(root),i:"bass",v:.07}); tones.forEach(n=>{ ev.push({t:b+1,d:.4,f:hz(n),i:"pah",v:.022}); ev.push({t:b+2,d:.4,f:hz(n),i:"pah",v:.022}); }); }); return ev; }
+const TRACKS = {
+  // "La Valse du Pédant": an original musette-style waltz
+  valse:{ loop:true, len:48, ev:[
+    ...seq(`G4:1 C5:1 E5:1  G5:2 E5:1  F5:1 E5:1 D5:1  E5:3
+            A4:1 D5:1 F5:1  A5:2 F5:1  E5:1 D5:1 C5:1  D5:3
+            G4:1 B4:1 D5:1  F5:2 E5:1  D#5:1 E5:1 G5:1  C6:2 A5:1
+            G5:1 E5:1 C5:1  D5:1.5 E5:.5 D5:1  B4:1 D5:1 G4:1  C5:3`,"acc",.045),
+    ...waltzBacking(["C","C","G7","C","Dm","Dm","G","G","G","G7","C","F","C","G","G7","C"]) ]},
+  // "Le Galop du Boss": an original, faster, minor-key chase
+  galop:{ loop:true, len:16, ev:(()=>{ const ev=seq(`A4:.5 C5:.5 E5:.5 A5:.5  G#5:.5 E5:.5 B4:.5 E5:.5  F5:.5 E5:.5 D5:.5 C5:.5  B4:.5 E5:.5 G#4:1
+      A4:.5 C5:.5 E5:.5 A5:.5  B5:.5 A5:.5 G#5:.5 F5:.5  E5:.5 C5:.5 D5:.5 B4:.5  A4:1.5 -:.5`,"acc",.045);
+      [["A2","E3"],["E2","B2"],["D3","A3"],["E2","B2"],["A2","E3"],["D3","A3"],["E2","B2"],["A2","E3"]].forEach(([r,f],bar)=>{
+        for(let k=0;k<4;k++){ ev.push({t:bar*2+k*.5,d:.4,f:hz(k%2?f:r),i:"bass",v:.07}); if(k%2) ev.push({t:bar*2+k*.5,d:.1,f:0,i:"hat",v:.02}); } });
+      return ev; })() },
+  // "Au clair de la lune" (traditional, 18th century) as a music box for the intro
+  lune:{ loop:true, len:16, ev:[ ...seq("C5:1 C5:1 C5:1 D5:1 E5:2 D5:2 C5:1 E5:1 D5:1 D5:1 C5:4","box",.06),
+    ...seq("C3:4 C3:4 C3:2 G2:2 C3:4","bass",.04) ]},
+  // Opening of "La Marseillaise" (1792) as the wave-cleared fanfare
+  marseillaise:{ loop:false, len:12, ev:[ ...seq("D4:.75 D4:.25 D4:1 G4:1 G4:1 A4:1 A4:1 D5:2 B4:.75 G4:.25 G4:2","acc",.07),
+    ...seq("G2:1 -:1 G2:1 -:1 D3:1 -:1 G2:2 G2:2 -:2","bass",.08) ]},
+  trombone:{ loop:false, len:7, ev: seq("G3:1 F#3:1 F3:1 E3:3","trom",.08) }
+};
+const music = { on:true, gain:null, track:null, name:null, bpm:140, next:0, pos:0, steps:null, timer:null, duck:1 };
+let noiseBuf=null;
+function mOut(){ const a=ctx(); if(!a) return null; if(!music.gain){ music.gain=a.createGain(); music.gain.gain.value=music.on?.6:0; music.gain.connect(a.destination); } return music.gain; }
+function voice(e, t, dur){
+  const a=actx, out=mOut(); if(!out) return;
+  const g=a.createGain(); g.connect(out); const v=e.v, end=t+dur;
+  const osc=(type,f,det=0)=>{ const o=a.createOscillator(); o.type=type; o.frequency.value=f; o.detune.value=det; return o; };
+  if(e.i==="acc"||e.i==="trom"){
+    const f=a.createBiquadFilter(); f.type="lowpass"; f.frequency.value=e.i==="acc"?2400:900; f.connect(g);
+    const lfo=osc("sine",e.i==="acc"?5.5:4.5), lg=a.createGain(); lg.gain.value=e.i==="acc"?7:28; lfo.connect(lg);
+    const os = e.i==="acc" ? [osc("sawtooth",e.f,-7),osc("sawtooth",e.f,7),osc("square",e.f/2)] : [osc("sawtooth",e.f),osc("sawtooth",e.f*1.003)];
+    os.forEach((o,k)=>{ lg.connect(o.detune); let c=o; if(e.i==="acc"&&k===2){ const q=a.createGain(); q.gain.value=.35; o.connect(q); q.connect(f); } else o.connect(f); o.start(t); o.stop(end+.06); });
+    if(e.i==="trom") os.forEach(o=>o.frequency.setValueAtTime(e.f,t));
+    lfo.start(t); lfo.stop(end+.06);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.02); g.gain.setValueAtTime(v,Math.max(t+.02,end-.05)); g.gain.linearRampToValueAtTime(0,end);
+  } else if(e.i==="bass"||e.i==="pah"||e.i==="box"){
+    const o=osc(e.i==="pah"?"square":"triangle", e.f); let src=o;
+    if(e.i==="pah"){ const f=a.createBiquadFilter(); f.type="lowpass"; f.frequency.value=1400; o.connect(f); src=f; }
+    src.connect(g);
+    const decay = e.i==="box" ? Math.min(dur,1.4) : e.i==="pah" ? .14 : Math.min(dur,.45);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.008); g.gain.exponentialRampToValueAtTime(.0005,t+decay);
+    o.start(t); o.stop(t+decay+.05);
+    if(e.i==="box"){ const o2=osc("sine",e.f*2), g2=a.createGain(); g2.gain.value=.3; o2.connect(g2).connect(g); o2.start(t); o2.stop(t+decay+.05); }
+  } else if(e.i==="hat"){
+    if(!noiseBuf){ noiseBuf=a.createBuffer(1,a.sampleRate*.1,a.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+    const s=a.createBufferSource(); s.buffer=noiseBuf; const f=a.createBiquadFilter(); f.type="highpass"; f.frequency.value=7000;
+    s.connect(f).connect(g); g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.0005,t+.05); s.start(t); s.stop(t+.06);
+  }
+}
+function playTrack(name, bpm){
+  const a=ctx(); if(!a) return; mOut();
+  const tr=TRACKS[name]; music.track=tr; music.name=name; music.bpm=bpm||music.bpm; music.pos=0; music.next=a.currentTime+.08;
+  music.steps={}; tr.ev.forEach(e=>{ const k=Math.round(e.t*4); (music.steps[k]=music.steps[k]||[]).push(e); });
+  if(!music.timer) music.timer=setInterval(tickMusic,25);
+}
+function stopMusic(){ music.track=null; music.name=null; }
+function tickMusic(){
+  if(!actx || !music.track) return;
+  while(music.next < actx.currentTime+.15){
+    const spb=60/music.bpm, k=Math.round(music.pos*4);
+    (music.steps[k]||[]).forEach(e=>voice(e, music.next, e.d*spb));
+    music.next += .25*spb; music.pos += .25;
+    if(music.pos >= music.track.len){ if(music.track.loop) music.pos=0; else { stopMusic(); return; } }
+  }
+}
+function duck(on){ if(!music.gain||!actx) return; music.duck=on?.35:1; music.gain.gain.setTargetAtTime(music.on?.6*music.duck:0, actx.currentTime, .08); }
+function setMusicOn(on){ music.on=on; if(music.gain&&actx) music.gain.gain.setTargetAtTime(on?.6*music.duck:0, actx.currentTime, .05); }
+const waveBpm = () => 138 + Math.min(S.wave,10)*5;
+document.addEventListener("visibilitychange", () => { if(!actx) return; if(document.hidden) actx.suspend(); else actx.resume(); });
 
 /* ======================= Professor reactions ======================= */
 let popTimer;
@@ -376,7 +458,8 @@ const INTRO = [
     <li>English words float down. Shoot each one with its <b>official French term</b> before it lands.</li>
     <li>Pick an answer (or press <b>1</b>, <b>2</b>, <b>3</b>). Tap any word to aim at it.</li>
     <li>Every third wave, a <b>boss</b> arrives, alone and slowly. Hit it three times: choose, then <b>type</b>, then (in Mode Académicien) <b>say it out loud</b>.</li>
-    <li>Turn on <b>🎙️ Mode Académicien</b> to fire by voice, for double points.</li></ul>`, btn:"Défendre la langue !"}
+    <li>Turn on <b>🎙️ Mode Académicien</b> to fire by voice, for double points.</li>
+    <li>Music too loud? The <b>🎵</b> button below the cannon turns it off.</li></ul>`, btn:"Défendre la langue !"}
 ];
 
 /* ======================= Game state ======================= */
@@ -614,6 +697,9 @@ function loop(t){
     if(!(S.target && !S.target.dead && stageOf(S.target)==="type")) setTarget(low);
     else if(S.target.dead) setTarget(low);
   }
+  { const bossAlive = S.words.some(w=>w.kind==="boss" && !w.dead); const want = bossAlive ? "galop" : "valse";
+    const bpm = (bossAlive ? 172 : waveBpm()) * (S.purity < 30 ? 1.12 : 1);
+    if(music.name !== want) playTrack(want, bpm); else music.bpm = bpm; }
   if(S.spawned>=S.toSpawn && S.words.length===0 && S.bossDone){ waveCleared(); return; }
   requestAnimationFrame(loop);
 }
@@ -627,7 +713,7 @@ function waveCleared(){
     ["Splendide ! Je vous décernerais bien une épée.", `Rank: <b>${r}</b>. Académie swords are custom-made, so you'll have to wait.`]
   ];
   const [fr,en] = lines[(S.wave-1) % lines.length];
-  sfx.fanfare();
+  playTrack("marseillaise", 120);
   dialog([{fr, en: en + (S.wave%3===2 ? "<br><br>⚠️ Next wave: a <b>boss</b>. Choose, type, then shout." : ""), mood:"happy", btn:`Vague ${S.wave+1}`}], () => {
     S.wave++; S.paused=false; S.last=0; S.target=null; S.manual=false; startWave(); requestAnimationFrame(loop);
   });
@@ -674,6 +760,11 @@ fsBtn.onclick = () => {
 const fsSync = () => { const on = !!fsEl(); fsBtn.setAttribute("aria-pressed", on); const t = on ? "Quitter le plein écran" : "Plein écran";
   $("fsIco").textContent = on ? "✕" : "⛶"; fsBtn.setAttribute("aria-label", t); fsBtn.title = t; };
 document.addEventListener("fullscreenchange", fsSync); document.addEventListener("webkitfullscreenchange", fsSync);
+$("musicBtn").onclick = () => { setMusicOn(!music.on); $("musicBtn").setAttribute("aria-pressed",music.on); $("musicBtn").textContent = music.on?"🎵 Musique":"🔇 Musique"; };
+// browsers only allow sound after a first click: start the intro music then
+function firstGesture(){ ctx(); if(actx && actx.state==="suspended") actx.resume(); if(!S.running && !music.name) playTrack("lune",72);
+  document.removeEventListener("pointerdown",firstGesture,true); document.removeEventListener("keydown",firstGesture,true); }
+document.addEventListener("pointerdown",firstGesture,true); document.addEventListener("keydown",firstGesture,true);
 
 document.addEventListener("keydown", e => {
   if(document.activeElement && document.activeElement.tagName==="INPUT") return;
@@ -686,13 +777,14 @@ function start(){
   ctx(); if(actx && actx.state==="suspended") actx.resume();
   sky.querySelectorAll(".word,.ball,.puff,.splat,.franglais,.pts").forEach(n=>n.remove());
   S = fresh(); S.running = true; cannon.style.transform="";
-  $("over").hidden = true; hud(); renderAnswer(); startWave(); requestAnimationFrame(loop);
+  $("over").hidden = true; hud(); renderAnswer(); startWave(); playTrack("valse", waveBpm()); requestAnimationFrame(loop);
 }
 function weakest(){ const e = Object.entries(S.missed).sort((a,b)=>b[1]-a[1])[0]; if(!e) return null;
   const t = DATA.terms.concat(DATA.bosses).find(t=>t.en===e[0]); return t; }
 let shareBlob = null, shareText = "";
 function gameOver(){
   S.running=false; try{ if(voiceOn) rec.stop(); }catch(_){}
+  playTrack("trombone", 70);
   const wk = weakest(), r = rank(S.wave-1);
   shareText = `🎩🇫🇷 J'ai francisé ${S.converted} anglicismes dans Opération La Défense (score ${S.score}, vague ${S.wave}). Mon grade : ${r}.` + (wk?` Mon point faible : « ${wk.en} » (= ${wk.fr}).`:"") + " Et vous, vous dites « mot-dièse » ?";
   const verdict = S.score > 1500 ? ["Vous n'avez pas démérité. Presque digne de l'Académie.","Not bad at all. Almost worthy of the Académie."]
