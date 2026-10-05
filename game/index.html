@@ -319,14 +319,18 @@ const sfx = {
 let frVoice = null;
 function loadVoices(){ try{ const vs = speechSynthesis.getVoices(); frVoice = vs.find(v=>v.lang==="fr-FR") || vs.find(v=>v.lang && v.lang.startsWith("fr")) || null; }catch(e){} }
 if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+let curUtter = null;
+// stop the voice and bring the music back up (a cancelled utterance fires onerror, not onend)
+function hush(){ curUtter = null; try{ speechSynthesis.cancel(); }catch(e){} duck(false); }
 function say(text, {prof=false, onend}={}){
   if(!soundOn || !("speechSynthesis" in window)){ onend && setTimeout(onend, 1200); return; }
   try{
     const u = new SpeechSynthesisUtterance(text); u.lang="fr-FR"; if(frVoice) u.voice=frVoice;
     u.rate = prof ? 1.02 : .95; u.pitch = prof ? .75 : 1;
-    u.onstart = () => duck(true);
-    u.onend = () => { duck(false); onend && onend(); };
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    u.onstart = () => { if(curUtter===u) duck(true); };
+    u.onend = () => { if(curUtter===u){ curUtter=null; duck(false); } onend && onend(); };
+    u.onerror = () => { if(curUtter===u){ curUtter=null; duck(false); } };
+    speechSynthesis.cancel(); curUtter = u; speechSynthesis.speak(u);
   }catch(e){ onend && onend(); }
 }
 
@@ -437,11 +441,11 @@ function dialog(steps, done){
     const acts = $("dActs"); acts.innerHTML = "";
     if(s.skip && i < steps.length-1){
       const sk = document.createElement("button"); sk.className="big alt"; sk.textContent=s.skip;
-      sk.onclick = () => { speechSynthesis && speechSynthesis.cancel(); box.hidden = true; done && done(); };
+      sk.onclick = () => { hush(); box.hidden = true; done && done(); };
       acts.appendChild(sk); acts.append(" ");
     }
     const b = document.createElement("button"); b.className="big"; b.textContent = s.btn || "Continuer";
-    b.onclick = () => { if(i < steps.length-1){ i++; show(); } else { try{speechSynthesis.cancel();}catch(e){} box.hidden = true; done && done(); } };
+    b.onclick = () => { if(i < steps.length-1){ i++; show(); } else { hush(); box.hidden = true; done && done(); } };
     acts.appendChild(b); b.focus();
     prof.classList.add("talking");
     say(s.fr, {prof:true, onend:()=>prof.classList.remove("talking")});
@@ -744,7 +748,7 @@ $("voiceBtn").onclick = () => {
   if(voiceOn){ try{rec.start(); heard("Je vous écoute… dites le mot français !");}catch(_){} } else { try{rec.stop();}catch(_){} }
   if(S && S.target) renderAnswer();
 };
-$("soundBtn").onclick = () => { soundOn=!soundOn; $("soundBtn").setAttribute("aria-pressed",soundOn); $("soundBtn").textContent = soundOn?"🔊 Son et voix":"🔇 Son et voix"; if(!soundOn) try{speechSynthesis.cancel();}catch(e){} };
+$("soundBtn").onclick = () => { soundOn=!soundOn; $("soundBtn").setAttribute("aria-pressed",soundOn); $("soundBtn").textContent = soundOn?"🔊 Son et voix":"🔇 Son et voix"; if(!soundOn) hush(); };
 
 /* Full screen: native when allowed; inside an iframe without permission, open the game in a new tab */
 const fsBtn = $("fsBtn"), framed = (() => { try { return window.self !== window.top; } catch(_) { return true; } })();
